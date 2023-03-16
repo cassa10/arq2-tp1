@@ -5,6 +5,7 @@ doc/
 docs/
 spec/
 data/
+resources/
 *.md
 *.yaml
 *.yml

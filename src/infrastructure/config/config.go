@@ -8,6 +8,7 @@ type Config struct {
 	Environment string `required:"true" default:"development"`
 	Port        int    `required:"true" default:"8080"`
 	LogLevel    string `split_words:"true" default:"DEBUG"`
+	MongoUri    string `split_words:"true" required:"true"`
 }
 
 func LoadConfig() Config {
