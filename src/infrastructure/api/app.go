@@ -2,13 +2,28 @@ package api
 
 import (
 	"fmt"
+	swaggerDocs "github.com/cassa10/arq2-tp1/docs"
+	v1 "github.com/cassa10/arq2-tp1/src/infrastructure/api/v1"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/config"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"io"
 	"net/http"
 )
 
+// Application
+// @title arq2-tp1 API
+// @version 1.0
+// @description api for tp arq2-tp1
+// @contact.name API SUPPORT
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+// @BasePath /
+// @query.collection.format multi
 type Application interface {
 	Run() error
 }
@@ -26,17 +41,32 @@ func NewApplication(l logger.Logger, conf config.Config) Application {
 }
 
 func (app *application) Run() error {
+	swaggerDocs.SwaggerInfo.Host = fmt.Sprintf("localhost:%v", app.config.Port)
+
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = io.Discard
 
 	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
+	router.GET("/", HealthCheck)
 
 	rv1 := router.Group("/api/v1")
-	rv1.GET("/asd", func(c *gin.Context) { c.String(http.StatusOK, "asd ok") })
+	rv1.GET("/test", v1.TestHandler(app.logger))
+	rv1.POST("/test", v1.TestPostHandler(app.logger))
+
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	app.logger.Infof("running http server on port %d", app.config.Port)
 	return router.Run(fmt.Sprintf(":%d", app.config.Port))
+}
+
+// HealthCheck
+// @Summary Show the status of server.
+// @Description get the status of server.
+// @Tags Health check
+// @Accept */*
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router / [get]
+func HealthCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, map[string]interface{}{"data": "Server is up and running"})
 }

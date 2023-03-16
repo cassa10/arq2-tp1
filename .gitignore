@@ -17,3 +17,7 @@ vendor/
 
 # IDE
 .idea/
+.vscode/
+
+# swagger
+docs/

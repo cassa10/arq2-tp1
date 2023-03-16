@@ -20,6 +20,8 @@ type Logger struct {
 	*log.Entry
 }
 
+type Fields log.Fields
+
 // New : param "level" could be INFO, DEBUG, WARN, PANIC, TRACE, FATAL or ERROR. Otherwise must be setted DEBUG
 func New(environment, level string) Logger {
 	logger := log.New()
@@ -32,4 +34,8 @@ func New(environment, level string) Logger {
 	}
 	logger.SetLevel(logLevel)
 	return Logger{logger.WithFields(log.Fields{"environment": environment})}
+}
+
+func (l Logger) WithFields(f Fields) Logger {
+	return l.WithFields(f)
 }
