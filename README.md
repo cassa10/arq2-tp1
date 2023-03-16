@@ -18,7 +18,7 @@ http://localhost:<port>/docs/index.html
 ```
 
 
-## Inicializacion del proyecto
+## Inicialización y ejecución del proyecto
 
 ### Prerequisitos:
 
@@ -26,6 +26,37 @@ http://localhost:<port>/docs/index.html
 
 ### Pasos:
 
-1) A
+1) Ir a la carpeta root del repositorio
 
-2) B
+2) Construir el Dockerfile (imagen) del servicio
+
+```
+docker build -t arq2-tp1 .
+```
+
+3) Ejecutar la imagen construida
+
+```
+docker run -p <port>:8080 arq2-tp1
+```
+
+Nota: agregar "-d" si se quiere ejecutar como deamon
+
+```
+docker run -d -p <port>:8080 arq2-tp1
+```
+
+Ejemplo:
+
+```
+docker run -d -p 8082:8080 arq2-tp1
+```
+
+4) En un browser, abrir swagger del servicio en el siguiente url: 
+`http://localhost:<port>/docs/index.html`
+
+Segun el ejemplo: 
+`http://localhost:8082/docs/index.html`
+
+5) Probar el endpoint health check y debe retornar ok
+

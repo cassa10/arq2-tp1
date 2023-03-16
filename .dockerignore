@@ -5,7 +5,6 @@ doc/
 docs/
 spec/
 data/
-src/
 *.md
 *.yaml
 *.yml

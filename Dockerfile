@@ -5,7 +5,6 @@ RUN apk update && apk upgrade && apk add ca-certificates bash git openssh gcc g+
     && rm -rf /var/cache/apk/*
 
 # Build App
-
 WORKDIR /src
 
 RUN apk add --no-cache tzdata
@@ -14,13 +13,14 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY src/ ./internal/
+
+COPY /src  ./src/
 
 # update swagger docs/
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag init -g src/infrastructure/api/app.go
 
-WORKDIR /src/internal/cmd
+WORKDIR /src/src/cmd
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o /arq2-tp1-app
 
 # final stage
@@ -30,5 +30,3 @@ COPY --from=build /arq2-tp1-app /app/
 WORKDIR /app
 
 CMD ["./arq2-tp1-app"]
-
-# TODO: Validate build and executable
