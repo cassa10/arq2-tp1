@@ -37,19 +37,19 @@ docker build -t arq2-tp1 .
 3) Ejecutar la imagen construida
 
 ```
-docker run -p <port>:8080 arq2-tp1
+docker run -p <port>:8080 --name arq2-tp1 arq2-tp1
 ```
 
 Nota: agregar "-d" si se quiere ejecutar como deamon
 
 ```
-docker run -d -p <port>:8080 arq2-tp1
+docker run -d -p <port>:8080 --name arq2-tp1 arq2-tp1
 ```
 
 Ejemplo:
 
 ```
-docker run -d -p 8082:8080 arq2-tp1
+docker run -d -p 8082:8080 --name arq2-tp1 arq2-tp1
 ```
 
 4) En un browser, abrir swagger del servicio en el siguiente url:
