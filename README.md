@@ -52,11 +52,15 @@ Ejemplo:
 docker run -d -p 8082:8080 arq2-tp1
 ```
 
-4) En un browser, abrir swagger del servicio en el siguiente url: 
+4) En un browser, abrir swagger del servicio en el siguiente url:
+
 `http://localhost:<port>/docs/index.html`
 
-Segun el ejemplo: 
+Segun el ejemplo:
+
 `http://localhost:8082/docs/index.html`
 
 5) Probar el endpoint health check y debe retornar ok
+
+6) La API esta disponible para ser utilizada
 
