@@ -3,6 +3,33 @@
 [Enunciado del Trabajo Práctico](https://github.com/cassa10/arq2-tp1/blob/main/doc/Arq2%20-%20Trabajo%20pr%C3%A1ctico.pdf)
 
 
+## Test y coverage
+
+### Prerequisitos:
+
+- Go 1.20 or up
+
+### Pasos:
+
+1) Ir al folder root del repositorio
+
+2) Ejecutar los comandos
+```
+> go test -coverprofile="coverage.out" -covermode=atomic ./...
+> go install gitlab.com/fgmarand/gocoverstats@latest
+> gocoverstats -v -f coverage.out > coverage_rates.out
+```
+
+3) Se generará el file coverage.out el cual contedrá el info del coverage, y 
+overage_rates.out que contendrá los porcentajes de coverage en decimales [0.0 - 1].
+
+**Nota**: En la construcción de la imagen, se realiza la ejecucion de test y la generacion del coverage.
+Los archivos de coverage son almacenados dentro del container en la carpeta "/app". Es decir, que encontraremos:
+- /app/coverage.out
+- /app/coverage_rates.out
+
+Dichos archivos se pueden acceder desde docker desktop (recomendado), o bien, vinculando el filesystem del container con un volume y accediendo a dicho volume.
+
 ## Swagger
 
 Para actualizar la api doc de swagger, ejecutar en el folder root del repo:
