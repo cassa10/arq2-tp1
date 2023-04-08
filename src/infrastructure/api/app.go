@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	swaggerDocs "github.com/cassa10/arq2-tp1/docs"
+	"github.com/cassa10/arq2-tp1/src/domain/action/command"
+	"github.com/cassa10/arq2-tp1/src/domain/action/query"
 	v1 "github.com/cassa10/arq2-tp1/src/infrastructure/api/v1"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/config"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
@@ -31,12 +33,21 @@ type Application interface {
 type application struct {
 	logger logger.Logger
 	config config.Config
+	*ApplicationUseCases
 }
 
-func NewApplication(l logger.Logger, conf config.Config) Application {
+type ApplicationUseCases struct {
+	CreateCustomerCmd *command.CreateCustomer
+	UpdateCustomerCmd *command.UpdateCustomer
+	DeleteCustomerCmd *command.DeleteCustomer
+	FindCustomerQuery *query.FindCustomer
+}
+
+func NewApplication(l logger.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
 	return &application{
-		logger: l,
-		config: conf,
+		logger:              l,
+		config:              conf,
+		ApplicationUseCases: applicationUseCases,
 	}
 }
 
@@ -50,8 +61,14 @@ func (app *application) Run() error {
 	router.GET("/", HealthCheck)
 
 	rv1 := router.Group("/api/v1")
-	rv1.GET("/test", v1.TestHandler(app.logger))
-	rv1.POST("/test", v1.TestPostHandler(app.logger))
+	//customer
+	{
+		rv1Customer := rv1.Group("/customer")
+		rv1Customer.POST("", v1.CreateCustomerHandler(app.logger, app.CreateCustomerCmd))
+		rv1Customer.GET("/:customerId", v1.FindCustomerHandler(app.logger, app.FindCustomerQuery))
+		rv1Customer.DELETE("/:customerId", v1.DeleteCustomerHandler(app.logger, app.DeleteCustomerCmd))
+		rv1Customer.PUT("/:customerId", v1.UpdateCustomerHandler(app.logger, app.UpdateCustomerCmd))
+	}
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

@@ -1,41 +1,239 @@
 package logger
 
 import (
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 )
 
-var _level = map[string]log.Level{
-	"INFO":  log.InfoLevel,
-	"DEBUG": log.DebugLevel,
-	"WARN":  log.WarnLevel,
-	"PANIC": log.PanicLevel,
-	"TRACE": log.TraceLevel,
-	"FATAL": log.FatalLevel,
-	"ERROR": log.ErrorLevel,
+const JsonFormat = "JSON"
+
+type Fields map[string]interface{}
+
+type logger struct {
+	logger  *logrus.Logger
+	dFields map[string]interface{}
 }
 
-type Logger struct {
-	*log.Entry
+type entry struct {
+	entry   *logrus.Entry
+	dFields map[string]interface{}
 }
 
-type Fields log.Fields
+// Logger represents an entity that writes logs with custom fields
+type Logger interface {
+	WithFields(map[string]interface{}) Logger
+	Print(...interface{})
+	Debug(...interface{})
+	Info(...interface{})
+	Warn(...interface{})
+	Error(...interface{})
+	Fatal(...interface{})
+	Panic(...interface{})
+	Printf(string, ...interface{})
+	Debugf(string, ...interface{})
+	Infof(string, ...interface{})
+	Warnf(string, ...interface{})
+	Errorf(string, ...interface{})
+	Fatalf(string, ...interface{})
+	Panicf(string, ...interface{})
+}
 
-// New : param "level" could be INFO, DEBUG, WARN, PANIC, TRACE, FATAL or ERROR. Otherwise must be setted DEBUG
-func New(environment, level string) Logger {
-	logger := log.New()
-	logger.SetFormatter(&log.JSONFormatter{
-		TimestampFormat: time.RFC3339Nano,
-	})
-	logLevel, exist := _level[strings.ToUpper(level)]
-	if !exist {
-		logger.SetLevel(log.DebugLevel)
+// Config is used to configure the Logger
+type Config struct {
+	ServiceName     string
+	EnvironmentName string
+	LogLevel        string
+	LogFormat       string
+	DefaultFields   map[string]interface{}
+}
+
+// New creates a new Logger from some configuration
+func New(config *Config) Logger {
+	fields := addIfNotEmpty(config.DefaultFields, "serviceName", config.ServiceName)
+	fields = addIfNotEmpty(fields, "environment", config.EnvironmentName)
+	newLogger := &logger{
+		logger:  logrus.StandardLogger(),
+		dFields: fields,
 	}
-	logger.SetLevel(logLevel)
-	return Logger{logger.WithFields(log.Fields{"environment": environment})}
+	configure(config)
+	return newLogger
 }
 
-func (l Logger) WithFields(f Fields) Logger {
-	return l.WithFields(f)
+func (l *logger) WithFields(fields map[string]interface{}) Logger {
+	return &entry{
+		entry:   l.logger.WithFields(collectFields(l.dFields, fields)),
+		dFields: l.dFields,
+	}
+}
+
+func (l *logger) Print(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Print(message...)
+}
+
+func (l *logger) Debug(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Debug(message...)
+}
+
+func (l *logger) Info(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Info(message...)
+}
+
+func (l *logger) Warn(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Warn(message...)
+}
+
+func (l *logger) Error(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Error(message...)
+}
+
+func (l *logger) Fatal(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Fatal(message...)
+}
+
+func (l *logger) Panic(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panic(message...)
+}
+
+func (l *logger) Printf(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Printf(format, message...)
+}
+
+func (l *logger) Debugf(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Debugf(format, message...)
+}
+
+func (l *logger) Infof(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Infof(format, message...)
+}
+
+func (l *logger) Warnf(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Warnf(format, message...)
+}
+
+func (l *logger) Errorf(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Errorf(format, message...)
+}
+
+func (l *logger) Fatalf(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Fatalf(format, message...)
+}
+
+func (l *logger) Panicf(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panicf(format, message...)
+}
+
+func (e *entry) WithFields(fields map[string]interface{}) Logger {
+	return &entry{
+		entry:   e.entry.WithFields(collectFields(e.dFields, fields)),
+		dFields: e.dFields,
+	}
+}
+
+func (e *entry) Print(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Print(message...)
+}
+
+func (e *entry) Debug(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Debug(message...)
+}
+
+func (e *entry) Info(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Info(message...)
+}
+
+func (e *entry) Warn(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Warn(message...)
+}
+
+func (e *entry) Error(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Error(message...)
+}
+
+func (e *entry) Fatal(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Fatal(message...)
+}
+
+func (e *entry) Panic(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panic(message...)
+}
+
+func (e *entry) Printf(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Printf(format, message...)
+}
+
+func (e *entry) Debugf(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Debugf(format, message...)
+}
+
+func (e *entry) Infof(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Infof(format, message...)
+}
+
+func (e *entry) Warnf(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Warnf(format, message...)
+}
+
+func (e *entry) Errorf(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Errorf(format, message...)
+}
+
+func (e *entry) Fatalf(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Fatalf(format, message...)
+}
+
+func (e *entry) Panicf(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panicf(format, message...)
+}
+
+func collectFields(a map[string]interface{}, b map[string]interface{}) map[string]interface{} {
+	var allFields = make(map[string]interface{}, len(a)+len(b))
+	for k, v := range a {
+		allFields[k] = v
+	}
+	for k, v := range b {
+		allFields[k] = v
+	}
+	return allFields
+}
+
+func configure(configuration *Config) {
+	logrus.SetLevel(getLevel(configuration.LogLevel))
+	logrus.SetFormatter(getFormatter(configuration.LogFormat))
+}
+
+func getLevel(logLevel string) logrus.Level {
+	level, err := logrus.ParseLevel(logLevel)
+	if err != nil {
+		return logrus.InfoLevel
+	}
+	return level
+}
+
+func getFormatter(format string) logrus.Formatter {
+	envType := valueOrDefault(format, "plain")
+	if strings.ToUpper(envType) == JsonFormat {
+		return &logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano}
+	}
+	return &logrus.TextFormatter{TimestampFormat: time.RFC3339Nano}
+}
+
+func valueOrDefault(name string, defaultValue string) string {
+	v := strings.TrimSpace(name)
+	if v == "" {
+		return defaultValue
+	}
+	return v
+}
+
+func addIfNotEmpty(fields map[string]interface{}, key string, value string) map[string]interface{} {
+	if strings.TrimSpace(value) != "" {
+		newFields := fields
+		if len(newFields) == 0 {
+			newFields = make(map[string]interface{})
+		}
+		newFields[key] = value
+		return newFields
+	}
+	return fields
 }

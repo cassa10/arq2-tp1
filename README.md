@@ -63,7 +63,9 @@ docker build -t arq2-tp1 .
 
 3) Ejecutar la imagen construida
 
-Importante: Se requiere configurar env var "MONGO_URI" dentro de ./resources/local.env con `"mongodb+srv://<user>:<password>@cluster0.80ymcdr.mongodb.net/?retryWrites=true&w=majority"`
+Importante: Se requiere configurar env var "MONGO_URI" dentro de ./resources/local.env con `"mongodb+srv://<user>:<password>@cluster0.80ymcdr.mongodb.net/<database>?retryWrites=true&w=majority"`
+
+database = "arq-soft-2-meli"
 
 Nota: Pedir credenciales por privado.
 
