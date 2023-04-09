@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"github.com/cassa10/arq2-tp1/src/domain/util"
 	"time"
 )
@@ -31,8 +32,8 @@ func (o *Order) Delivered() bool {
 }
 
 type OrderRepository interface {
-	FindById(id int64) (Order, error)
-	Create(order Order) (Order, error)
-	Update(order Order) (Order, error)
-	Delete(id int64) (bool, error)
+	FindById(ctx context.Context, id int64) (*Order, error)
+	Create(ctx context.Context, order Order) (int64, error)
+	Update(ctx context.Context, order Order) (bool, error)
+	Delete(ctx context.Context, id int64) (bool, error)
 }

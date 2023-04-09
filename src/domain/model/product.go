@@ -1,17 +1,25 @@
 package model
 
 import (
+	"context"
 	"github.com/cassa10/arq2-tp1/src/domain/util"
 )
 
 type Product struct {
-	Id          int64   `json:"id"`
-	SellerId    int64   `json:"sellerId"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Category    string  `json:"category"`
-	Stock       int     `json:"stock"`
+	Id          int64   `json:"id" bson:"_id"`
+	SellerId    int64   `json:"sellerId" bson:"sellerId"`
+	Name        string  `json:"name" bson:"name"`
+	Description string  `json:"description" bson:"description"`
+	Price       float64 `json:"price" bson:"price"`
+	Category    string  `json:"category" bson:"category"`
+	Stock       int     `json:"stock" bson:"stock"`
+}
+
+func (p Product) Merge(updateProduct UpdateProduct) {
+	p.Name = updateProduct.Name
+	p.Description = updateProduct.Description
+	p.Price = updateProduct.Price
+	p.Category = updateProduct.Category
 }
 
 func (p Product) String() string {
@@ -19,8 +27,9 @@ func (p Product) String() string {
 }
 
 type ProductRepository interface {
-	AddProduct(sellerId int64, product Product) (bool, error)
-	UpdateProduct(sellerId int64, product Product) (bool, error)
-	DeleteProduct(sellerId int64, productId int64) (bool, error)
-	Search(filters ProductSearchFilter) ([]Product, error)
+	FindById(ctx context.Context, id int64) (*Product, error)
+	Create(ctx context.Context, product Product) (int64, error)
+	Update(ctx context.Context, product Product) (bool, error)
+	Delete(ctx context.Context, id int64) (bool, error)
+	Search(ctx context.Context, filters ProductSearchFilter) ([]Product, error)
 }

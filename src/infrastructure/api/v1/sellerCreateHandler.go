@@ -12,7 +12,7 @@ import (
 // CreateSellerHandler
 // @Summary      Endpoint create seller
 // @Description  create seller
-// @Param Seller body dto.SellerCreateReq true "It is a seller."
+// @Param Seller body dto.SellerCreateReq true "It is a seller creation request."
 // @Tags         Seller
 // @Produce json
 // @Success 200 {object} dto.IdResponse
@@ -32,7 +32,7 @@ func CreateSellerHandler(log logger.Logger, createSellerCmd *command.CreateSelle
 			case exception.SellerAlreadyExistError:
 				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
 			default:
-				defaultInternalServerError(log, c, "uncaught exception when create seller", err)
+				defaultInternalServerError(log, c, "uncaught error when create seller", err)
 			}
 			return
 		}

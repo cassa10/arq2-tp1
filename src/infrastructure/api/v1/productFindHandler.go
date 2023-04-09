@@ -8,34 +8,34 @@ import (
 	"net/http"
 )
 
-// FindSellerHandler
-// @Summary      Endpoint find seller
-// @Description  find seller
-// @Param sellerId path int true "Seller ID"
-// @Tags         Seller
+// FindProductHandler
+// @Summary      Endpoint find product
+// @Description  find product
+// @Param productId path int true "Product ID"
+// @Tags         Product
 // @Produce json
 // @Success 200
 // @Success 400
 // @Failure 404
-// @Router       /api/v1/seller/{sellerId} [get]
-func FindSellerHandler(log logger.Logger, findSellerByIdQuery *query.FindSellerById) gin.HandlerFunc {
+// @Router       /api/v1/seller/product/{productId} [get]
+func FindProductHandler(log logger.Logger, findProductByIdQuery *query.FindProductById) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, err := parsePathParamPositiveIntId(c, "sellerId")
+		id, err := parsePathParamPositiveIntId(c, "productId")
 		if err != nil {
 			log.WithFields(logger.Fields{"error": err}).Error("invalid path param")
 			writeJsonErrorMessage(c, http.StatusBadRequest, err)
 			return
 		}
-		seller, err := findSellerByIdQuery.Do(c.Request.Context(), id)
+		product, err := findProductByIdQuery.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.SellerNotFoundErr:
+			case exception.ProductNotFoundErr:
 				writeJsonErrorMessage(c, http.StatusNotFound, err)
 			default:
-				defaultInternalServerError(log, c, "uncaught error when find seller", err)
+				defaultInternalServerError(log, c, "uncaught error when find product", err)
 			}
 			return
 		}
-		c.JSON(http.StatusOK, seller)
+		c.JSON(http.StatusOK, product)
 	}
 }

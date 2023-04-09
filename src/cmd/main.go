@@ -35,15 +35,28 @@ func main() {
 	updateSellerCmd := command.NewUpdateSeller(sellerRepo, *findSellerByIdQuery)
 	deleteSellerCmd := command.NewDeleteSeller(sellerRepo, *findSellerByIdQuery)
 
+	//product
+	productRepo := mongo.NewProductRepository(baseLogger, db, conf.MongoTimeout)
+	findProductByIdQuery := query.NewFindProductById(productRepo)
+	createProductCmd := command.NewCreateProduct(productRepo, *findSellerByIdQuery)
+	updateProductCmd := command.NewUpdateProduct(productRepo, *findProductByIdQuery)
+	deleteProductCmd := command.NewDeleteProduct(productRepo, *findProductByIdQuery)
+
 	app := api.NewApplication(baseLogger, conf, &api.ApplicationUseCases{
 		FindCustomerQuery: findCustomerByIdQuery,
 		CreateCustomerCmd: createCustomerCmd,
 		UpdateCustomerCmd: updateCustomerCmd,
 		DeleteCustomerCmd: deleteCustomerCmd,
-		FindSellerQuery:   findSellerByIdQuery,
-		CreateSellerCmd:   createSellerCmd,
-		UpdateSellerCmd:   updateSellerCmd,
-		DeleteSellerCmd:   deleteSellerCmd,
+
+		FindSellerQuery: findSellerByIdQuery,
+		CreateSellerCmd: createSellerCmd,
+		UpdateSellerCmd: updateSellerCmd,
+		DeleteSellerCmd: deleteSellerCmd,
+
+		FindProductQuery: findProductByIdQuery,
+		CreateProductCmd: createProductCmd,
+		UpdateProductCmd: updateProductCmd,
+		DeleteProductCmd: deleteProductCmd,
 	})
 	baseLogger.Fatal(app.Run())
 }

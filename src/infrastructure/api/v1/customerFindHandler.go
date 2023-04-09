@@ -22,7 +22,8 @@ func FindCustomerHandler(log logger.Logger, findCustomerQuery *query.FindCustome
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "customerId")
 		if err != nil {
-			log.WithFields(logger.Fields{"exception": err}).Error("invalid path param")
+			log.WithFields(logger.Fields{"error": err}).Error("invalid path param")
+			writeJsonErrorMessage(c, http.StatusBadRequest, err)
 			return
 		}
 		customer, err := findCustomerQuery.Do(c.Request.Context(), id)
@@ -31,7 +32,7 @@ func FindCustomerHandler(log logger.Logger, findCustomerQuery *query.FindCustome
 			case exception.CustomerNotFoundErr:
 				writeJsonErrorMessage(c, http.StatusNotFound, err)
 			default:
-				defaultInternalServerError(log, c, "uncaught exception when find customer", err)
+				defaultInternalServerError(log, c, "uncaught error when find customer", err)
 			}
 			return
 		}

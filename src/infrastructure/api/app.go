@@ -47,6 +47,11 @@ type ApplicationUseCases struct {
 	UpdateSellerCmd *command.UpdateSeller
 	DeleteSellerCmd *command.DeleteSeller
 	FindSellerQuery *query.FindSellerById
+	//product
+	CreateProductCmd *command.CreateProduct
+	UpdateProductCmd *command.UpdateProduct
+	DeleteProductCmd *command.DeleteProduct
+	FindProductQuery *query.FindProductById
 }
 
 func NewApplication(l logger.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
@@ -80,6 +85,13 @@ func (app *application) Run() error {
 		rv1Seller.GET("/:sellerId", v1.FindSellerHandler(app.logger, app.FindSellerQuery))
 		rv1Seller.DELETE("/:sellerId", v1.DeleteSellerHandler(app.logger, app.DeleteSellerCmd))
 		rv1Seller.PUT("/:sellerId", v1.UpdateSellerHandler(app.logger, app.UpdateSellerCmd))
+	}
+	{
+		rv1.POST("/seller/:sellerId/product", v1.CreateProductHandler(app.logger, app.CreateProductCmd))
+		rv1Product := rv1.Group("/seller/product")
+		rv1Product.GET("/:productId", v1.FindProductHandler(app.logger, app.FindProductQuery))
+		rv1Product.DELETE("/:productId", v1.DeleteProductHandler(app.logger, app.DeleteProductCmd))
+		rv1Product.PUT("/:productId", v1.UpdateProductHandler(app.logger, app.UpdateProductCmd))
 	}
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

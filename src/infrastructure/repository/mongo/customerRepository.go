@@ -102,7 +102,7 @@ func (r *customerRepository) Update(ctx context.Context, customer model.Customer
 			log.Infof("customer with new email already exist")
 			return false, exception.CustomerAlreadyExistError{Email: customer.Email}
 		}
-		log.WithFields(logger.Fields{"exception": err}).Error("exception when update customer")
+		log.WithFields(logger.Fields{"error": err}).Error("error when update customer")
 		return false, err
 	}
 	if updateRes.ModifiedCount == 0 {
@@ -119,7 +119,7 @@ func (r *customerRepository) Delete(ctx context.Context, id int64) (bool, error)
 	defer cf()
 	deleteRes, err := r.db.Collection(customerCollection).DeleteOne(timeout, bson.M{"_id": id})
 	if err != nil {
-		log.WithFields(logger.Fields{"exception": err}).Errorf("exception when delete customer with id %v", id)
+		log.WithFields(logger.Fields{"error": err}).Errorf("error when delete customer with id %v", id)
 		return false, err
 	}
 	if deleteRes.DeletedCount == 0 {
@@ -139,7 +139,7 @@ func (r *customerRepository) createIndex(ctx context.Context) {
 	}
 	_, err := r.db.Collection(customerCollection).Indexes().CreateOne(timeout, index)
 	if err != nil {
-		r.logger.WithFields(logger.Fields{"exception": err}).Fatalf("could not create mongo index")
+		r.logger.WithFields(logger.Fields{"error": err}).Fatalf("could not create mongo index")
 	} else {
 		r.logger.Infof("mongo index created")
 	}

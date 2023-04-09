@@ -23,7 +23,8 @@ func DeleteCustomerHandler(log logger.Logger, deleteCustomerCmd *command.DeleteC
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "customerId")
 		if err != nil {
-			log.WithFields(logger.Fields{"exception": err}).Error("invalid path param")
+			log.WithFields(logger.Fields{"error": err}).Error("invalid path param")
+			writeJsonErrorMessage(c, http.StatusBadRequest, err)
 			return
 		}
 		err = deleteCustomerCmd.Do(c.Request.Context(), id)
@@ -34,7 +35,7 @@ func DeleteCustomerHandler(log logger.Logger, deleteCustomerCmd *command.DeleteC
 			case exception.CustomerCannotDelete:
 				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
 			default:
-				defaultInternalServerError(log, c, "uncaught exception when delete customer", err)
+				defaultInternalServerError(log, c, "uncaught error when delete customer", err)
 			}
 			return
 		}

@@ -26,7 +26,7 @@ func getNextId(ctx context.Context, baseLogger logger.Logger, db *mongo.Database
 	}
 	var res dto.NextIdResponse
 	if err := db.RunCommand(timeout, command, opts).Decode(&res); err != nil {
-		log.WithFields(logger.Fields{"exception": err}).Errorf("get next id exception with counter collection %s and _id %s", counterCollection, collection)
+		log.WithFields(logger.Fields{"error": err}).Errorf("get next id error with counter collection %s and _id %s", counterCollection, collection)
 		return 0, err
 	}
 	log.Debugf("get next id successful with value %v", res.Value.Seq)

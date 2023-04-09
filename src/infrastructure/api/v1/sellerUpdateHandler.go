@@ -26,7 +26,8 @@ func UpdateSellerHandler(log logger.Logger, updateSellerCmd *command.UpdateSelle
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "sellerId")
 		if err != nil {
-			log.WithFields(logger.Fields{"exception": err}).Error("invalid path param")
+			log.WithFields(logger.Fields{"error": err}).Error("invalid path param")
+			writeJsonErrorMessage(c, http.StatusBadRequest, err)
 			return
 		}
 		var request model.UpdateSeller
@@ -42,7 +43,7 @@ func UpdateSellerHandler(log logger.Logger, updateSellerCmd *command.UpdateSelle
 			case exception.SellerCannotUpdate, exception.SellerAlreadyExistError:
 				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
 			default:
-				defaultInternalServerError(log, c, "uncaught exception when update seller", err)
+				defaultInternalServerError(log, c, "uncaught error when update seller", err)
 			}
 			return
 		}

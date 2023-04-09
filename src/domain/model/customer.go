@@ -7,9 +7,9 @@ import (
 
 type Customer struct {
 	Id        int64  `json:"id" bson:"_id"`
-	Firstname string `json:"firstname" bson:"firstname" binding:"required"`
-	Lastname  string `json:"lastname" bson:"lastname" binding:"required"`
-	Email     string `json:"email" bson:"email" binding:"required,email"`
+	Firstname string `json:"firstname" bson:"firstname"`
+	Lastname  string `json:"lastname" bson:"lastname"`
+	Email     string `json:"email" bson:"email"`
 }
 
 func (c *Customer) Merge(updateCustomer UpdateCustomer) {
