@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/cassa10/arq2-tp1/src/domain/action/command"
 	"github.com/cassa10/arq2-tp1/src/domain/model"
+	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/dto"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
@@ -25,7 +26,7 @@ func UpdateCustomerHandler(log logger.Logger, updateCustomerCmd *command.UpdateC
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "customerId")
 		if err != nil {
-			log.WithFields(logger.Fields{"error": err}).Error("invalid path param")
+			log.WithFields(logger.Fields{"exception": err}).Error("invalid path param")
 			return
 		}
 		var request model.UpdateCustomer
@@ -36,12 +37,12 @@ func UpdateCustomerHandler(log logger.Logger, updateCustomerCmd *command.UpdateC
 		err = updateCustomerCmd.Do(c.Request.Context(), id, request)
 		if err != nil {
 			switch err.(type) {
-			case model.CustomerNotFoundErr:
+			case exception.CustomerNotFoundErr:
 				writeJsonErrorMessage(c, http.StatusNotFound, err)
-			case model.CustomerCannotUpdate:
+			case exception.CustomerCannotUpdate, exception.CustomerAlreadyExistError:
 				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
 			default:
-				defaultInternalServerError(log, c, "uncaught error when update customer", err)
+				defaultInternalServerError(log, c, "uncaught exception when update customer", err)
 			}
 			return
 		}

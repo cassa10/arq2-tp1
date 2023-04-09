@@ -15,9 +15,10 @@ func NewCreateCustomer(customerRepo model.CustomerRepository) *CreateCustomer {
 	}
 }
 
-func (c CreateCustomer) Do(ctx context.Context, customer model.Customer) error {
-	if _, err := c.customerRepo.Create(ctx, customer); err != nil {
-		return err
+func (c CreateCustomer) Do(ctx context.Context, customer model.Customer) (int64, error) {
+	customerId, err := c.customerRepo.Create(ctx, customer)
+	if err != nil {
+		return 0, err
 	}
-	return nil
+	return customerId, nil
 }

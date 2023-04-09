@@ -10,11 +10,11 @@ import (
 )
 
 func defaultInternalServerError(log logger.Logger, ginContext *gin.Context, additionalLogInfo string, err error) {
-	log.WithFields(logger.Fields{"error": err}).Error(additionalLogInfo)
-	ginContext.JSON(http.StatusInternalServerError, dto.NewErrorMessage("internal server error"))
+	log.WithFields(logger.Fields{"exception": err}).Error(additionalLogInfo)
+	ginContext.JSON(http.StatusInternalServerError, dto.NewErrorMessage("internal server exception"))
 }
 
-// parsePathParamPositiveIntId writes in c *gin.Context with Bad Request with message error when cannot parse properly 'paramKey' as a positive int64
+// parsePathParamPositiveIntId writes in c *gin.Context with Bad Request with message exception when cannot parse properly 'paramKey' as a positive int64
 func parsePathParamPositiveIntId(c *gin.Context, paramKey string) (int64, error) {
 	_idParam, _ := c.Params.Get(paramKey)
 	id, err := strconv.ParseInt(_idParam, 10, 64)

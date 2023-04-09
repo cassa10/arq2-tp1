@@ -1,4 +1,4 @@
-package model
+package exception
 
 import "fmt"
 
@@ -11,11 +11,15 @@ func (e CustomerAlreadyExistError) Error() string {
 }
 
 type CustomerNotFoundErr struct {
-	Id int64
+	Id    int64
+	Email string
 }
 
 func (e CustomerNotFoundErr) Error() string {
-	return fmt.Sprintf("customer with id %v not found", e.Id)
+	if e.Id != 0 {
+		return fmt.Sprintf("customer with id %v not found", e.Id)
+	}
+	return fmt.Sprintf("customer with email %v not found", e.Email)
 }
 
 type CustomerCannotDelete struct {
@@ -23,7 +27,7 @@ type CustomerCannotDelete struct {
 }
 
 func (e CustomerCannotDelete) Error() string {
-	return fmt.Sprintf("customer with id %v cannot deleted", e.Id)
+	return fmt.Sprintf("customer with id %v cannot delete", e.Id)
 }
 
 type CustomerCannotUpdate struct {

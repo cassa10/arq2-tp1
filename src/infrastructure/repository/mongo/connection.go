@@ -17,7 +17,7 @@ func Connect(ctx context.Context, baseLogger logger.Logger, uri, database string
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 
 	if err != nil {
-		log.WithFields(logger.Fields{"err": err}).Fatalf("an error has occurred while trying to connect to mongo cluster")
+		log.WithFields(logger.Fields{"err": err}).Fatalf("an exception has occurred while trying to connect to mongo cluster")
 	}
 
 	// check the connection

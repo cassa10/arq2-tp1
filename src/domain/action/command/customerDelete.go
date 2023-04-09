@@ -7,19 +7,19 @@ import (
 )
 
 type DeleteCustomer struct {
-	customerRepo      model.CustomerRepository
-	findCustomerQuery query.FindCustomer
+	customerRepo          model.CustomerRepository
+	findCustomerByIdQuery query.FindCustomerById
 }
 
-func NewDeleteCustomer(customerRepo model.CustomerRepository, findCustomer query.FindCustomer) *DeleteCustomer {
+func NewDeleteCustomer(customerRepo model.CustomerRepository, findCustomer query.FindCustomerById) *DeleteCustomer {
 	return &DeleteCustomer{
-		customerRepo:      customerRepo,
-		findCustomerQuery: findCustomer,
+		customerRepo:          customerRepo,
+		findCustomerByIdQuery: findCustomer,
 	}
 }
 
 func (c DeleteCustomer) Do(ctx context.Context, id int64) error {
-	_, err := c.findCustomerQuery.Do(ctx, id)
+	_, err := c.findCustomerByIdQuery.Do(ctx, id)
 	if err != nil {
 		return err
 	}

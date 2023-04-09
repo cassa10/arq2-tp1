@@ -37,10 +37,16 @@ type application struct {
 }
 
 type ApplicationUseCases struct {
+	//customer
 	CreateCustomerCmd *command.CreateCustomer
 	UpdateCustomerCmd *command.UpdateCustomer
 	DeleteCustomerCmd *command.DeleteCustomer
-	FindCustomerQuery *query.FindCustomer
+	FindCustomerQuery *query.FindCustomerById
+	//seller
+	CreateSellerCmd *command.CreateSeller
+	UpdateSellerCmd *command.UpdateSeller
+	DeleteSellerCmd *command.DeleteSeller
+	FindSellerQuery *query.FindSellerById
 }
 
 func NewApplication(l logger.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
@@ -61,13 +67,19 @@ func (app *application) Run() error {
 	router.GET("/", HealthCheck)
 
 	rv1 := router.Group("/api/v1")
-	//customer
 	{
 		rv1Customer := rv1.Group("/customer")
 		rv1Customer.POST("", v1.CreateCustomerHandler(app.logger, app.CreateCustomerCmd))
 		rv1Customer.GET("/:customerId", v1.FindCustomerHandler(app.logger, app.FindCustomerQuery))
 		rv1Customer.DELETE("/:customerId", v1.DeleteCustomerHandler(app.logger, app.DeleteCustomerCmd))
 		rv1Customer.PUT("/:customerId", v1.UpdateCustomerHandler(app.logger, app.UpdateCustomerCmd))
+	}
+	{
+		rv1Seller := rv1.Group("/seller")
+		rv1Seller.POST("", v1.CreateSellerHandler(app.logger, app.CreateSellerCmd))
+		rv1Seller.GET("/:sellerId", v1.FindSellerHandler(app.logger, app.FindSellerQuery))
+		rv1Seller.DELETE("/:sellerId", v1.DeleteSellerHandler(app.logger, app.DeleteSellerCmd))
+		rv1Seller.PUT("/:sellerId", v1.UpdateSellerHandler(app.logger, app.UpdateSellerCmd))
 	}
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

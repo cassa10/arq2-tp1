@@ -20,18 +20,30 @@ func main() {
 	})
 
 	db := mongo.Connect(context.Background(), baseLogger, conf.MongoURI, conf.MongoDatabase)
-	customerRepo := mongo.NewCustomerRepository(baseLogger, db, conf.MongoTimeout)
-	findCustomerQuery := query.NewFindCustomer(customerRepo)
-	createCustomerCmd := command.NewCreateCustomer(customerRepo)
-	updateCustomerCmd := command.NewUpdateCustomer(customerRepo, *findCustomerQuery)
-	deleteCustomerCmd := command.NewDeleteCustomer(customerRepo, *findCustomerQuery)
 
-	appUseCases := &api.ApplicationUseCases{
+	//customer
+	customerRepo := mongo.NewCustomerRepository(baseLogger, db, conf.MongoTimeout)
+	findCustomerByIdQuery := query.NewFindCustomerById(customerRepo)
+	createCustomerCmd := command.NewCreateCustomer(customerRepo)
+	updateCustomerCmd := command.NewUpdateCustomer(customerRepo, *findCustomerByIdQuery)
+	deleteCustomerCmd := command.NewDeleteCustomer(customerRepo, *findCustomerByIdQuery)
+
+	//seller
+	sellerRepo := mongo.NewSellerRepository(baseLogger, db, conf.MongoTimeout)
+	findSellerByIdQuery := query.NewFindSellerById(sellerRepo)
+	createSellerCmd := command.NewCreateSeller(sellerRepo)
+	updateSellerCmd := command.NewUpdateSeller(sellerRepo, *findSellerByIdQuery)
+	deleteSellerCmd := command.NewDeleteSeller(sellerRepo, *findSellerByIdQuery)
+
+	app := api.NewApplication(baseLogger, conf, &api.ApplicationUseCases{
+		FindCustomerQuery: findCustomerByIdQuery,
 		CreateCustomerCmd: createCustomerCmd,
 		UpdateCustomerCmd: updateCustomerCmd,
-		FindCustomerQuery: findCustomerQuery,
 		DeleteCustomerCmd: deleteCustomerCmd,
-	}
-	app := api.NewApplication(baseLogger, conf, appUseCases)
+		FindSellerQuery:   findSellerByIdQuery,
+		CreateSellerCmd:   createSellerCmd,
+		UpdateSellerCmd:   updateSellerCmd,
+		DeleteSellerCmd:   deleteSellerCmd,
+	})
 	baseLogger.Fatal(app.Run())
 }
