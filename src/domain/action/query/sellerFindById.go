@@ -6,15 +6,26 @@ import (
 )
 
 type FindSellerById struct {
-	sellerRepo model.SellerRepository
+	sellerRepo  model.SellerRepository
+	productRepo model.ProductRepository
 }
 
-func NewFindSellerById(sellerRepo model.SellerRepository) *FindSellerById {
+func NewFindSellerById(sellerRepo model.SellerRepository, productRepo model.ProductRepository) *FindSellerById {
 	return &FindSellerById{
-		sellerRepo: sellerRepo,
+		sellerRepo:  sellerRepo,
+		productRepo: productRepo,
 	}
 }
 
 func (q FindSellerById) Do(ctx context.Context, id int64) (*model.Seller, error) {
-	return q.sellerRepo.FindById(ctx, id)
+	seller, err := q.sellerRepo.FindById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	sellerProducts, err := q.productRepo.FindAllBySellerId(ctx, seller.Id)
+	if err != nil {
+		return nil, err
+	}
+	seller.Products = sellerProducts
+	return seller, nil
 }

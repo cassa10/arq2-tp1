@@ -92,6 +92,14 @@ func (app *application) Run() error {
 		rv1Product.GET("/:productId", v1.FindProductHandler(app.logger, app.FindProductQuery))
 		rv1Product.DELETE("/:productId", v1.DeleteProductHandler(app.logger, app.DeleteProductCmd))
 		rv1Product.PUT("/:productId", v1.UpdateProductHandler(app.logger, app.UpdateProductCmd))
+		//rv1Product.GET("/search", v1.SearchProductHandler(app.logger, app.SearchProductQuery))
+	}
+	{
+		//rv1Order := rv1.Group("/order")
+		//rv1.POST("", v1.CreateOrderHandler(app.logger, app.CreateOrderUseCase))
+		//rv1Order.GET("/:orderId", v1.FindOrderHandler(app.logger, app.FindOrderQuery))
+		//rv1Order.POST("/:orderId/confirm", v1.ConfirmOrderHandler(app.logger, app.ConfirmOrderUseCase))
+		//rv1Order.POST("/:orderId/delivered", v1.DeliveredOrderHandler(app.logger, app.DeliveredOrderUseCase))
 	}
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

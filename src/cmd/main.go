@@ -21,22 +21,24 @@ func main() {
 
 	db := mongo.Connect(context.Background(), baseLogger, conf.MongoURI, conf.MongoDatabase)
 
-	//customer
+	//repositories
 	customerRepo := mongo.NewCustomerRepository(baseLogger, db, conf.MongoTimeout)
+	sellerRepo := mongo.NewSellerRepository(baseLogger, db, conf.MongoTimeout)
+	productRepo := mongo.NewProductRepository(baseLogger, db, conf.MongoTimeout)
+
+	//customer
 	findCustomerByIdQuery := query.NewFindCustomerById(customerRepo)
 	createCustomerCmd := command.NewCreateCustomer(customerRepo)
 	updateCustomerCmd := command.NewUpdateCustomer(customerRepo, *findCustomerByIdQuery)
 	deleteCustomerCmd := command.NewDeleteCustomer(customerRepo, *findCustomerByIdQuery)
 
 	//seller
-	sellerRepo := mongo.NewSellerRepository(baseLogger, db, conf.MongoTimeout)
-	findSellerByIdQuery := query.NewFindSellerById(sellerRepo)
+	findSellerByIdQuery := query.NewFindSellerById(sellerRepo, productRepo)
 	createSellerCmd := command.NewCreateSeller(sellerRepo)
 	updateSellerCmd := command.NewUpdateSeller(sellerRepo, *findSellerByIdQuery)
 	deleteSellerCmd := command.NewDeleteSeller(sellerRepo, *findSellerByIdQuery)
 
 	//product
-	productRepo := mongo.NewProductRepository(baseLogger, db, conf.MongoTimeout)
 	findProductByIdQuery := query.NewFindProductById(productRepo)
 	createProductCmd := command.NewCreateProduct(productRepo, *findSellerByIdQuery)
 	updateProductCmd := command.NewUpdateProduct(productRepo, *findProductByIdQuery)

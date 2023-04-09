@@ -43,8 +43,6 @@ func (r *sellerRepository) FindById(ctx context.Context, id int64) (*model.Selle
 		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err
 	}
-	//TODO: Get Products
-	seller.Products = []model.Product{}
 	return &seller, nil
 }
 
@@ -61,8 +59,6 @@ func (r *sellerRepository) FindByName(ctx context.Context, name string) (*model.
 		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err
 	}
-	//TODO: Get Products
-	seller.Products = []model.Product{}
 	return &seller, nil
 }
 

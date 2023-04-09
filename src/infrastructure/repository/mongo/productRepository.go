@@ -98,6 +98,29 @@ func (r *productRepository) Create(ctx context.Context, product model.Product) (
 	return product.Id, nil
 }
 
+func (r *productRepository) FindAllBySellerId(ctx context.Context, sellerId int64) ([]model.Product, error) {
+	log := r.logger.WithFields(logger.Fields{"method": "FindById", "sellerId": sellerId})
+	filter := bson.M{"sellerId": sellerId}
+	timeout, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+
+	cur, err := r.db.Collection(productCollection).Find(timeout, filter)
+	if err != nil {
+		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("something went wrong when find with filter %s", filter))
+		return nil, err
+	}
+	products := make([]model.Product, 0)
+	for cur.Next(timeout) {
+		var product model.Product
+		if err := cur.Decode(&product); err != nil {
+			log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("something went wrong when want decode product"))
+			return products, err
+		}
+		products = append(products, product)
+	}
+	return products, nil
+}
+
 func (r *productRepository) Search(ctx context.Context, filters model.ProductSearchFilter) ([]model.Product, error) {
 	panic("not implemented yet")
 }

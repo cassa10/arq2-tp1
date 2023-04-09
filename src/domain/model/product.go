@@ -15,14 +15,14 @@ type Product struct {
 	Stock       int     `json:"stock" bson:"stock"`
 }
 
-func (p Product) Merge(updateProduct UpdateProduct) {
+func (p *Product) Merge(updateProduct UpdateProduct) {
 	p.Name = updateProduct.Name
 	p.Description = updateProduct.Description
 	p.Price = updateProduct.Price
 	p.Category = updateProduct.Category
 }
 
-func (p Product) String() string {
+func (p *Product) String() string {
 	return util.ParseStruct("Product", p)
 }
 
@@ -31,5 +31,6 @@ type ProductRepository interface {
 	Create(ctx context.Context, product Product) (int64, error)
 	Update(ctx context.Context, product Product) (bool, error)
 	Delete(ctx context.Context, id int64) (bool, error)
+	FindAllBySellerId(ctx context.Context, sellerId int64) ([]Product, error)
 	Search(ctx context.Context, filters ProductSearchFilter) ([]Product, error)
 }
