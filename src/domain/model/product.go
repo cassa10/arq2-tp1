@@ -26,11 +26,12 @@ func (p *Product) String() string {
 	return util.ParseStruct("Product", p)
 }
 
+//go:generate mockgen -destination=../mock/productRepository.go -package=mock -source=product.go
 type ProductRepository interface {
 	FindById(ctx context.Context, id int64) (*Product, error)
 	Create(ctx context.Context, product Product) (int64, error)
 	Update(ctx context.Context, product Product) (bool, error)
 	Delete(ctx context.Context, id int64) (bool, error)
 	FindAllBySellerId(ctx context.Context, sellerId int64) ([]Product, error)
-	Search(ctx context.Context, filters ProductSearchFilter) ([]Product, error)
+	Search(ctx context.Context, filters ProductSearchFilter, pagingReq PagingRequest) ([]Product, Paging, error)
 }

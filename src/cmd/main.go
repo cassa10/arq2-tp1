@@ -43,6 +43,7 @@ func main() {
 	createProductCmd := command.NewCreateProduct(productRepo, *findSellerByIdQuery)
 	updateProductCmd := command.NewUpdateProduct(productRepo, *findProductByIdQuery)
 	deleteProductCmd := command.NewDeleteProduct(productRepo, *findProductByIdQuery)
+	searchProductQuery := query.NewSearchProduct(productRepo)
 
 	app := api.NewApplication(baseLogger, conf, &api.ApplicationUseCases{
 		FindCustomerQuery: findCustomerByIdQuery,
@@ -55,10 +56,11 @@ func main() {
 		UpdateSellerCmd: updateSellerCmd,
 		DeleteSellerCmd: deleteSellerCmd,
 
-		FindProductQuery: findProductByIdQuery,
-		CreateProductCmd: createProductCmd,
-		UpdateProductCmd: updateProductCmd,
-		DeleteProductCmd: deleteProductCmd,
+		FindProductQuery:   findProductByIdQuery,
+		CreateProductCmd:   createProductCmd,
+		UpdateProductCmd:   updateProductCmd,
+		DeleteProductCmd:   deleteProductCmd,
+		SearchProductQuery: searchProductQuery,
 	})
 	baseLogger.Fatal(app.Run())
 }

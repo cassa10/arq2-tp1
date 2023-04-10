@@ -8,6 +8,8 @@ import (
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"math"
 	"time"
 )
 
@@ -109,6 +111,7 @@ func (r *productRepository) FindAllBySellerId(ctx context.Context, sellerId int6
 		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("something went wrong when find with filter %s", filter))
 		return nil, err
 	}
+	defer handleCloseCursor(cur, ctx, log)
 	products := make([]model.Product, 0)
 	for cur.Next(timeout) {
 		var product model.Product
@@ -121,8 +124,48 @@ func (r *productRepository) FindAllBySellerId(ctx context.Context, sellerId int6
 	return products, nil
 }
 
-func (r *productRepository) Search(ctx context.Context, filters model.ProductSearchFilter) ([]model.Product, error) {
-	panic("not implemented yet")
+func (r *productRepository) Search(ctx context.Context, searchFilters model.ProductSearchFilter, pagingReq model.PagingRequest) ([]model.Product, model.Paging, error) {
+	log := r.logger.WithFields(logger.Fields{"searchFilters": searchFilters, "paging": pagingReq})
+	filter := getFilter(searchFilters)
+	log = log.WithFields(logger.Fields{"mongoFields": filter})
+	timeout, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+
+	products := make([]model.Product, 0)
+	total, err := r.db.Collection(productCollection).CountDocuments(ctx, filter)
+	if err != nil {
+		log.WithFields(logger.Fields{"error": err}).Error("error when count documents for paging")
+		return products, model.EmptyPage(), err
+	}
+	totalPages := int(math.Ceil(float64(total) / float64(pagingReq.Size)))
+	skip := pagingReq.Size * (pagingReq.Page)
+	limit := pagingReq.Size
+
+	emptyPage := model.EmptyPage()
+	opts := options.Find().SetSkip(int64(skip)).SetLimit(int64(limit))
+	cur, err := r.db.Collection(productCollection).Find(timeout, filter, opts)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			log.Infof("successful search - no documents found")
+			return products, emptyPage, nil
+		}
+		log.WithFields(logger.Fields{"error": err}).Error("error when find documents")
+		return products, emptyPage, err
+	}
+	defer handleCloseCursor(cur, ctx, log)
+
+	for cur.Next(timeout) {
+		var product model.Product
+		if err := cur.Decode(&product); err != nil {
+			log.WithFields(logger.Fields{"error": err}).Error("error when decode some product")
+			return []model.Product{}, emptyPage, err
+		}
+		products = append(products, product)
+	}
+
+	pagingResult := model.NewPaging(int(total), len(products), totalPages, pagingReq.Page)
+	log.Infof("successful found products with pagingResult %s", pagingResult)
+	return products, pagingResult, nil
 }
 
 func (r *productRepository) createIndex(ctx context.Context) {
@@ -146,4 +189,13 @@ func (r *productRepository) createIndex(ctx context.Context) {
 	} else {
 		r.logger.Infof("mongo index created")
 	}
+}
+
+// bson.M{"$regex": bson.RegEx{Pattern: id, Options: "i"}}
+func getFilter(query model.ProductSearchFilter) bson.M {
+	return NewFilterBuilder().
+		AppendAndOpFilterIf(query.Name != "", bson.M{"name": createStringCaseInsensitiveFilter(query.Name)}).
+		AppendAndOpFilterIf(query.Category != "", bson.M{"category": createStringCaseInsensitiveFilter(query.Category)}).
+		AppendAndOpFilterIf(query.ContainsAnyPriceFilter(), bson.M{"price": bson.M{mongoGTEOp: query.GetPriceMinOrDefault(), mongoLTEOp: query.GetPriceMaxOrDefault()}}).
+		Build()
 }

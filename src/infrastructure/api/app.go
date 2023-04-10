@@ -48,10 +48,11 @@ type ApplicationUseCases struct {
 	DeleteSellerCmd *command.DeleteSeller
 	FindSellerQuery *query.FindSellerById
 	//product
-	CreateProductCmd *command.CreateProduct
-	UpdateProductCmd *command.UpdateProduct
-	DeleteProductCmd *command.DeleteProduct
-	FindProductQuery *query.FindProductById
+	CreateProductCmd   *command.CreateProduct
+	UpdateProductCmd   *command.UpdateProduct
+	DeleteProductCmd   *command.DeleteProduct
+	FindProductQuery   *query.FindProductById
+	SearchProductQuery *query.SearchProduct
 }
 
 func NewApplication(l logger.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
@@ -92,7 +93,7 @@ func (app *application) Run() error {
 		rv1Product.GET("/:productId", v1.FindProductHandler(app.logger, app.FindProductQuery))
 		rv1Product.DELETE("/:productId", v1.DeleteProductHandler(app.logger, app.DeleteProductCmd))
 		rv1Product.PUT("/:productId", v1.UpdateProductHandler(app.logger, app.UpdateProductCmd))
-		//rv1Product.GET("/search", v1.SearchProductHandler(app.logger, app.SearchProductQuery))
+		rv1Product.GET("/search", v1.SearchProductHandler(app.logger, app.SearchProductQuery))
 	}
 	{
 		//rv1Order := rv1.Group("/order")

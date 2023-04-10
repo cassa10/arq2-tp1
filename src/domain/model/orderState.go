@@ -1,9 +1,15 @@
 package model
 
+const (
+	pendingState   = "PENDING"
+	confirmedState = "CONFIRMED"
+	deliveredState = "DELIVERED"
+)
+
 type OrderState interface {
-	//Confirm returns true when order mutates
+	// Confirm returns true when order mutates
 	Confirm(order *Order) bool
-	//Delivered returns true when order mutates
+	// Delivered returns true when order mutates
 	Delivered(order *Order) bool
 	String() string
 }
@@ -20,7 +26,7 @@ func (pS PendingOrderState) Delivered(_ *Order) bool {
 }
 
 func (pS PendingOrderState) String() string {
-	return "PENDING"
+	return pendingState
 }
 
 type ConfirmedOrderState struct{}
@@ -35,7 +41,7 @@ func (cS ConfirmedOrderState) Delivered(order *Order) bool {
 }
 
 func (cS ConfirmedOrderState) String() string {
-	return "CONFIRMED"
+	return confirmedState
 }
 
 type DeliveredOrderState struct{}
@@ -49,5 +55,5 @@ func (dS DeliveredOrderState) Delivered(_ *Order) bool {
 }
 
 func (dS DeliveredOrderState) String() string {
-	return "DELIVERED"
+	return deliveredState
 }

@@ -31,6 +31,7 @@ func (o *Order) Delivered() bool {
 	return o.State.Delivered(o)
 }
 
+//go:generate mockgen -destination=../mock/orderRepository.go -package=mock -source=order.go
 type OrderRepository interface {
 	FindById(ctx context.Context, id int64) (*Order, error)
 	Create(ctx context.Context, order Order) (int64, error)
