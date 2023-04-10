@@ -30,7 +30,7 @@ func (u CreateOrder) Do(ctx context.Context, customerId, productId int64, delive
 	_, err := u.findCustomerByIdQuery.Do(ctx, customerId)
 	if err != nil {
 		log.WithFields(logger.Fields{"error": err}).Errorf("error when find customer")
-		return 0, nil
+		return 0, err
 	}
 	product, err := u.findProductByIdQuery.Do(ctx, productId)
 	if err != nil {
