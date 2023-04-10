@@ -15,12 +15,12 @@ import (
 const customerCollection = "customers"
 
 type customerRepository struct {
-	logger  logger.Logger
+	logger  model.Logger
 	db      *mongo.Database
 	timeout time.Duration
 }
 
-func NewCustomerRepository(baseLogger logger.Logger, db *mongo.Database, timeout time.Duration) model.CustomerRepository {
+func NewCustomerRepository(baseLogger model.Logger, db *mongo.Database, timeout time.Duration) model.CustomerRepository {
 	repo := &customerRepository{
 		logger:  baseLogger.WithFields(logger.Fields{"logger": "mongo.CustomerRepository", "customerCollection": customerCollection}),
 		db:      db,
@@ -64,23 +64,22 @@ func (r *customerRepository) FindByEmail(ctx context.Context, email string) (*mo
 
 func (r *customerRepository) Create(ctx context.Context, customer model.Customer) (int64, error) {
 	log := r.logger.WithFields(logger.Fields{"method": "Create"})
-
 	_, err := r.FindByEmail(ctx, customer.Email)
 	if _, customerNotExist := err.(exception.CustomerNotFoundErr); !customerNotExist {
 		log.Infof("customer already exist")
 		return 0, exception.CustomerAlreadyExistError{Email: customer.Email}
 	}
 
-	customerId, err := getNextId(ctx, log, r.db, r.timeout, customerCollection)
+	timeoutCtx, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+	customerId, err := getNextId(timeoutCtx, log, r.db, r.timeout, customerCollection)
 	if err != nil {
 		return 0, err
 	}
 	customer.Id = customerId
 
 	log = log.WithFields(logger.Fields{"customer": customer})
-	timeout, cf := context.WithTimeout(ctx, r.timeout)
-	defer cf()
-	if _, err := r.db.Collection(customerCollection).InsertOne(timeout, customer); err != nil {
+	if _, err := r.db.Collection(customerCollection).InsertOne(timeoutCtx, customer); err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Infof("customer already exist")
 			return 0, exception.CustomerAlreadyExistError{Email: customer.Email}

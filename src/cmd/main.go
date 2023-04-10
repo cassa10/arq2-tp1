@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cassa10/arq2-tp1/src/domain/action/command"
 	"github.com/cassa10/arq2-tp1/src/domain/action/query"
+	"github.com/cassa10/arq2-tp1/src/domain/usecase"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/api"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/config"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
@@ -18,13 +19,13 @@ func main() {
 		LogLevel:        conf.LogLevel,
 		LogFormat:       logger.JsonFormat,
 	})
-
-	db := mongo.Connect(context.Background(), baseLogger, conf.MongoURI, conf.MongoDatabase)
+	mongoDB := mongo.Connect(context.Background(), baseLogger, conf.MongoURI, conf.MongoDatabase)
 
 	//repositories
-	customerRepo := mongo.NewCustomerRepository(baseLogger, db, conf.MongoTimeout)
-	sellerRepo := mongo.NewSellerRepository(baseLogger, db, conf.MongoTimeout)
-	productRepo := mongo.NewProductRepository(baseLogger, db, conf.MongoTimeout)
+	customerRepo := mongo.NewCustomerRepository(baseLogger, mongoDB, conf.MongoTimeout)
+	sellerRepo := mongo.NewSellerRepository(baseLogger, mongoDB, conf.MongoTimeout)
+	productRepo := mongo.NewProductRepository(baseLogger, mongoDB, conf.MongoTimeout)
+	orderRepo := mongo.NewOrderRepository(baseLogger, mongoDB, conf.MongoTimeout, conf.MongoDatabase)
 
 	//customer
 	findCustomerByIdQuery := query.NewFindCustomerById(customerRepo)
@@ -45,6 +46,9 @@ func main() {
 	deleteProductCmd := command.NewDeleteProduct(productRepo, *findProductByIdQuery)
 	searchProductQuery := query.NewSearchProduct(productRepo)
 
+	//order
+	createOrderUseCase := usecase.NewCreateOrder(baseLogger, orderRepo, *findProductByIdQuery, *findCustomerByIdQuery)
+
 	app := api.NewApplication(baseLogger, conf, &api.ApplicationUseCases{
 		FindCustomerQuery: findCustomerByIdQuery,
 		CreateCustomerCmd: createCustomerCmd,
@@ -61,6 +65,8 @@ func main() {
 		UpdateProductCmd:   updateProductCmd,
 		DeleteProductCmd:   deleteProductCmd,
 		SearchProductQuery: searchProductQuery,
+
+		CreateOrderUseCase: createOrderUseCase,
 	})
 	baseLogger.Fatal(app.Run())
 }

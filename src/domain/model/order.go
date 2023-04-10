@@ -7,18 +7,30 @@ import (
 )
 
 type Order struct {
-	Id              int64      `json:"id"`
-	CreatedOn       time.Time  `json:"createdOn"`
-	UpdatedOn       time.Time  `json:"updatedOn"`
-	DeliveryDate    time.Time  `json:"deliveryDate"`
-	State           OrderState `json:"state"`
-	Product         Product    `json:"product"`
-	Customer        Customer   `json:"customer"`
-	DeliveryAddress Address    `json:"deliveryAddress"`
+	Id              int64
+	CustomerId      int64
+	CreatedOn       time.Time
+	UpdatedOn       time.Time
+	DeliveryDate    time.Time
+	State           OrderState
+	Product         *Product
+	DeliveryAddress Address
 }
 
-func (o *Order) String() string {
-	return util.ParseStruct("Order", o)
+func NewOrder(customerId int64, product *Product, deliveryDate time.Time, deliveryAddress Address) Order {
+	return Order{
+		CustomerId:      customerId,
+		CreatedOn:       time.Now(),
+		UpdatedOn:       time.Now(),
+		DeliveryDate:    deliveryDate,
+		State:           PendingOrderState{},
+		Product:         product,
+		DeliveryAddress: deliveryAddress,
+	}
+}
+
+func (o *Order) GetProductId() int64 {
+	return o.Product.Id
 }
 
 // Confirm returns true when order mutates
@@ -29,6 +41,14 @@ func (o *Order) Confirm() bool {
 // Delivered returns true when order mutates
 func (o *Order) Delivered() bool {
 	return o.State.Delivered(o)
+}
+
+func (o *Order) StateAsString() string {
+	return o.State.String()
+}
+
+func (o *Order) String() string {
+	return util.ParseStruct("Order", o)
 }
 
 //go:generate mockgen -destination=../mock/orderRepository.go -package=mock -source=order.go

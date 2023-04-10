@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/cassa10/arq2-tp1/src/domain/action/command"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,7 @@ import (
 // @Failure 404
 // @Failure 406
 // @Router       /api/v1/seller/{sellerId} [delete]
-func DeleteSellerHandler(log logger.Logger, deleteSellerCmd *command.DeleteSeller) gin.HandlerFunc {
+func DeleteSellerHandler(log model.Logger, deleteSellerCmd *command.DeleteSeller) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "sellerId")
 		if err != nil {

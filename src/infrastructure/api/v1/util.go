@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/dto"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,7 @@ import (
 	"strconv"
 )
 
-func defaultInternalServerError(log logger.Logger, ginContext *gin.Context, additionalLogInfo string, err error) {
+func defaultInternalServerError(log model.Logger, ginContext *gin.Context, additionalLogInfo string, err error) {
 	log.WithFields(logger.Fields{"error": err}).Error(additionalLogInfo)
 	ginContext.JSON(http.StatusInternalServerError, dto.NewErrorMessage("internal server error"))
 }

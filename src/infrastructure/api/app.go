@@ -5,9 +5,10 @@ import (
 	swaggerDocs "github.com/cassa10/arq2-tp1/docs"
 	"github.com/cassa10/arq2-tp1/src/domain/action/command"
 	"github.com/cassa10/arq2-tp1/src/domain/action/query"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
+	"github.com/cassa10/arq2-tp1/src/domain/usecase"
 	v1 "github.com/cassa10/arq2-tp1/src/infrastructure/api/v1"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/config"
-	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -31,7 +32,7 @@ type Application interface {
 }
 
 type application struct {
-	logger logger.Logger
+	logger model.Logger
 	config config.Config
 	*ApplicationUseCases
 }
@@ -53,9 +54,11 @@ type ApplicationUseCases struct {
 	DeleteProductCmd   *command.DeleteProduct
 	FindProductQuery   *query.FindProductById
 	SearchProductQuery *query.SearchProduct
+	//order
+	CreateOrderUseCase *usecase.CreateOrder
 }
 
-func NewApplication(l logger.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
+func NewApplication(l model.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
 	return &application{
 		logger:              l,
 		config:              conf,
@@ -96,8 +99,8 @@ func (app *application) Run() error {
 		rv1Product.GET("/search", v1.SearchProductHandler(app.logger, app.SearchProductQuery))
 	}
 	{
-		//rv1Order := rv1.Group("/order")
-		//rv1.POST("", v1.CreateOrderHandler(app.logger, app.CreateOrderUseCase))
+		rv1Order := rv1.Group("/order")
+		rv1Order.POST("", v1.CreateOrderHandler(app.logger, app.CreateOrderUseCase))
 		//rv1Order.GET("/:orderId", v1.FindOrderHandler(app.logger, app.FindOrderQuery))
 		//rv1Order.POST("/:orderId/confirm", v1.ConfirmOrderHandler(app.logger, app.ConfirmOrderUseCase))
 		//rv1Order.POST("/:orderId/delivered", v1.DeliveredOrderHandler(app.logger, app.DeliveredOrderUseCase))

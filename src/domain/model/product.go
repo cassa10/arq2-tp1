@@ -22,6 +22,10 @@ func (p *Product) Merge(updateProduct UpdateProduct) {
 	p.Category = updateProduct.Category
 }
 
+func (p *Product) ValidStock() bool {
+	return p.Stock > 0
+}
+
 func (p *Product) String() string {
 	return util.ParseStruct("Product", p)
 }

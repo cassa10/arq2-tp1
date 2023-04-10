@@ -29,3 +29,11 @@ type ProductCannotUpdate struct {
 func (e ProductCannotUpdate) Error() string {
 	return fmt.Sprintf("product with id %v cannot update", e.Id)
 }
+
+type ProductWithNoStock struct {
+	Id int64
+}
+
+func (e ProductWithNoStock) Error() string {
+	return fmt.Sprintf("product with id %v have no stock", e.Id)
+}

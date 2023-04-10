@@ -22,7 +22,7 @@ import (
 // @Failure 404
 // @Failure 406
 // @Router       /api/v1/seller/product/{productId} [put]
-func UpdateProductHandler(log logger.Logger, updateProductCmd *command.UpdateProduct) gin.HandlerFunc {
+func UpdateProductHandler(log model.Logger, updateProductCmd *command.UpdateProduct) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "productId")
 		if err != nil {

@@ -15,12 +15,12 @@ import (
 const sellerCollection = "sellers"
 
 type sellerRepository struct {
-	logger  logger.Logger
+	logger  model.Logger
 	db      *mongo.Database
 	timeout time.Duration
 }
 
-func NewSellerRepository(baseLogger logger.Logger, db *mongo.Database, timeout time.Duration) model.SellerRepository {
+func NewSellerRepository(baseLogger model.Logger, db *mongo.Database, timeout time.Duration) model.SellerRepository {
 	repo := &sellerRepository{
 		logger:  baseLogger.WithFields(logger.Fields{"logger": "mongo.SellerRepository", "sellerCollection": sellerCollection}),
 		db:      db,
@@ -71,16 +71,15 @@ func (r *sellerRepository) Create(ctx context.Context, seller model.Seller) (int
 		return 0, exception.SellerAlreadyExistError{Name: seller.Name}
 	}
 
-	sellerId, err := getNextId(ctx, log, r.db, r.timeout, sellerCollection)
+	timeoutCtx, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+	sellerId, err := getNextId(timeoutCtx, log, r.db, r.timeout, sellerCollection)
 	if err != nil {
 		return 0, err
 	}
 	seller.Id = sellerId
-
 	log = log.WithFields(logger.Fields{"seller": seller})
-	timeout, cf := context.WithTimeout(ctx, r.timeout)
-	defer cf()
-	if _, err := r.db.Collection(sellerCollection).InsertOne(timeout, seller); err != nil {
+	if _, err := r.db.Collection(sellerCollection).InsertOne(timeoutCtx, seller); err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Infof("seller already exist")
 			return 0, exception.SellerAlreadyExistError{Name: seller.Name}

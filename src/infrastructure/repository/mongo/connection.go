@@ -2,13 +2,14 @@ package mongo
 
 import (
 	"context"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
-func Connect(ctx context.Context, baseLogger logger.Logger, uri, database string) *mongo.Database {
+func Connect(ctx context.Context, baseLogger model.Logger, uri, database string) *mongo.Database {
 
 	log := baseLogger.WithFields(logger.Fields{"logger": "mongo", "database": database})
 	ctx, cf := context.WithTimeout(ctx, 10*time.Second)

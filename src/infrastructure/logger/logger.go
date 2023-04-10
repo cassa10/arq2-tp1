@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
@@ -20,25 +21,6 @@ type entry struct {
 	dFields map[string]interface{}
 }
 
-// Logger represents an entity that writes logs with custom fields
-type Logger interface {
-	WithFields(map[string]interface{}) Logger
-	Print(...interface{})
-	Debug(...interface{})
-	Info(...interface{})
-	Warn(...interface{})
-	Error(...interface{})
-	Fatal(...interface{})
-	Panic(...interface{})
-	Printf(string, ...interface{})
-	Debugf(string, ...interface{})
-	Infof(string, ...interface{})
-	Warnf(string, ...interface{})
-	Errorf(string, ...interface{})
-	Fatalf(string, ...interface{})
-	Panicf(string, ...interface{})
-}
-
 // Config is used to configure the Logger
 type Config struct {
 	ServiceName     string
@@ -49,7 +31,7 @@ type Config struct {
 }
 
 // New creates a new Logger from some configuration
-func New(config *Config) Logger {
+func New(config *Config) model.Logger {
 	fields := addIfNotEmpty(config.DefaultFields, "serviceName", config.ServiceName)
 	fields = addIfNotEmpty(fields, "environment", config.EnvironmentName)
 	newLogger := &logger{
@@ -60,7 +42,7 @@ func New(config *Config) Logger {
 	return newLogger
 }
 
-func (l *logger) WithFields(fields map[string]interface{}) Logger {
+func (l *logger) WithFields(fields map[string]interface{}) model.Logger {
 	return &entry{
 		entry:   l.logger.WithFields(collectFields(l.dFields, fields)),
 		dFields: l.dFields,
@@ -123,7 +105,7 @@ func (l *logger) Panicf(format string, message ...interface{}) {
 	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
-func (e *entry) WithFields(fields map[string]interface{}) Logger {
+func (e *entry) WithFields(fields map[string]interface{}) model.Logger {
 	return &entry{
 		entry:   e.entry.WithFields(collectFields(e.dFields, fields)),
 		dFields: e.dFields,

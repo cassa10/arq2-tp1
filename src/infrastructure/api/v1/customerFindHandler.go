@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/cassa10/arq2-tp1/src/domain/action/query"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,7 @@ import (
 // @Success 400
 // @Failure 404
 // @Router       /api/v1/customer/{customerId} [get]
-func FindCustomerHandler(log logger.Logger, findCustomerQuery *query.FindCustomerById) gin.HandlerFunc {
+func FindCustomerHandler(log model.Logger, findCustomerQuery *query.FindCustomerById) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "customerId")
 		if err != nil {

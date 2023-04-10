@@ -1,10 +1,18 @@
 package model
 
+import "strings"
+
 const (
 	pendingState   = "PENDING"
 	confirmedState = "CONFIRMED"
 	deliveredState = "DELIVERED"
 )
+
+var stateMapper = map[string]OrderState{
+	pendingState:   PendingOrderState{},
+	confirmedState: ConfirmedOrderState{},
+	deliveredState: DeliveredOrderState{},
+}
 
 type OrderState interface {
 	// Confirm returns true when order mutates
@@ -56,4 +64,9 @@ func (dS DeliveredOrderState) Delivered(_ *Order) bool {
 
 func (dS DeliveredOrderState) String() string {
 	return deliveredState
+}
+
+func GetStateByString(state string) (OrderState, bool) {
+	orderState, ok := stateMapper[strings.ToUpper(state)]
+	return orderState, ok
 }

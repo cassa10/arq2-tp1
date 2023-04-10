@@ -2,9 +2,9 @@ package v1
 
 import (
 	"github.com/cassa10/arq2-tp1/src/domain/action/command"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/dto"
-	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,7 +19,7 @@ import (
 // @Failure 400
 // @Failure 406
 // @Router       /api/v1/seller [post]
-func CreateSellerHandler(log logger.Logger, createSellerCmd *command.CreateSeller) gin.HandlerFunc {
+func CreateSellerHandler(log model.Logger, createSellerCmd *command.CreateSeller) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request dto.SellerCreateReq
 		if err := c.BindJSON(&request); err != nil {

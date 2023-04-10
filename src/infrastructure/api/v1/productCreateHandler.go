@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/cassa10/arq2-tp1/src/domain/action/command"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/dto"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
@@ -20,7 +21,7 @@ import (
 // @Failure 400
 // @Failure 404
 // @Router       /api/v1/seller/{sellerId}/product [post]
-func CreateProductHandler(log logger.Logger, createProductCmd *command.CreateProduct) gin.HandlerFunc {
+func CreateProductHandler(log model.Logger, createProductCmd *command.CreateProduct) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		sellerId, err := parsePathParamPositiveIntId(c, "sellerId")
 		if err != nil {

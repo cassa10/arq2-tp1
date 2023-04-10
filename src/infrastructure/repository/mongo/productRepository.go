@@ -16,18 +16,18 @@ import (
 const productCollection = "products"
 
 type productRepository struct {
-	logger  logger.Logger
+	logger  model.Logger
 	db      *mongo.Database
 	timeout time.Duration
 }
 
-func NewProductRepository(baseLogger logger.Logger, db *mongo.Database, timeout time.Duration) model.ProductRepository {
+func NewProductRepository(baseLogger model.Logger, db *mongo.Database, timeout time.Duration) model.ProductRepository {
 	repo := &productRepository{
 		logger:  baseLogger.WithFields(logger.Fields{"logger": "mongo.ProductRepository", "productCollection": productCollection}),
 		db:      db,
 		timeout: timeout,
 	}
-	repo.createIndex(context.Background())
+	repo.createIndexes(context.Background())
 	return repo
 }
 
@@ -83,16 +83,17 @@ func (r *productRepository) Delete(ctx context.Context, id int64) (bool, error) 
 
 func (r *productRepository) Create(ctx context.Context, product model.Product) (int64, error) {
 	log := r.logger.WithFields(logger.Fields{"method": "Create"})
-	productId, err := getNextId(ctx, log, r.db, r.timeout, productCollection)
+	timeoutCtx, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+
+	productId, err := getNextId(timeoutCtx, log, r.db, r.timeout, productCollection)
 	if err != nil {
 		return 0, err
 	}
 	product.Id = productId
 
 	log = log.WithFields(logger.Fields{"product": product})
-	timeout, cf := context.WithTimeout(ctx, r.timeout)
-	defer cf()
-	if _, err := r.db.Collection(productCollection).InsertOne(timeout, product); err != nil {
+	if _, err := r.db.Collection(productCollection).InsertOne(timeoutCtx, product); err != nil {
 		log.WithFields(logger.Fields{"error": err}).Error("couldn't create product")
 		return 0, err
 	}
@@ -168,7 +169,7 @@ func (r *productRepository) Search(ctx context.Context, searchFilters model.Prod
 	return products, pagingResult, nil
 }
 
-func (r *productRepository) createIndex(ctx context.Context) {
+func (r *productRepository) createIndexes(ctx context.Context) {
 	timeout, cf := context.WithTimeout(ctx, r.timeout)
 	defer cf()
 	indexes := []mongo.IndexModel{

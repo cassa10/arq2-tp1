@@ -2,8 +2,8 @@ package v1
 
 import (
 	"github.com/cassa10/arq2-tp1/src/domain/action/query"
+	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/dto"
-	"github.com/cassa10/arq2-tp1/src/infrastructure/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -22,7 +22,7 @@ import (
 // @Success 200 {object} dto.ProductSearchResponse
 // @Failure 400
 // @Router       /api/v1/seller/product/search [get]
-func SearchProductHandler(log logger.Logger, searchProductQuery *query.SearchProduct) gin.HandlerFunc {
+func SearchProductHandler(log model.Logger, searchProductQuery *query.SearchProduct) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var qs dto.ProductSearchQueryReq
 		if err := c.ShouldBindQuery(&qs); err != nil {
