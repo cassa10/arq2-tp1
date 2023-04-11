@@ -25,3 +25,11 @@ type OrderCannotUpdate struct {
 func (e OrderCannotUpdate) Error() string {
 	return fmt.Sprintf("order with id %v cannot update", e.Id)
 }
+
+type OrderInvalidTransitionState struct {
+	Id int64
+}
+
+func (e OrderInvalidTransitionState) Error() string {
+	return fmt.Sprintf("invalid transition state for order with id %v", e.Id)
+}

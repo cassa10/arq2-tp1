@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/cassa10/arq2-tp1/src/domain/action/command"
 	"github.com/cassa10/arq2-tp1/src/domain/action/query"
 	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
@@ -11,15 +12,15 @@ import (
 
 type CreateOrder struct {
 	baseLogger            model.Logger
-	orderRepository       model.OrderRepository
+	createOrderCmd        command.CreateOrder
 	findProductByIdQuery  query.FindProductById
 	findCustomerByIdQuery query.FindCustomerById
 }
 
-func NewCreateOrder(baseLogger model.Logger, orderRepository model.OrderRepository, findProductByIdQuery query.FindProductById, findCustomerByIdQuery query.FindCustomerById) *CreateOrder {
+func NewCreateOrder(baseLogger model.Logger, createOrderCmd command.CreateOrder, findProductByIdQuery query.FindProductById, findCustomerByIdQuery query.FindCustomerById) *CreateOrder {
 	return &CreateOrder{
 		baseLogger:            baseLogger.WithFields(logger.Fields{"useCase": "CreateOrder"}),
-		orderRepository:       orderRepository,
+		createOrderCmd:        createOrderCmd,
 		findProductByIdQuery:  findProductByIdQuery,
 		findCustomerByIdQuery: findCustomerByIdQuery,
 	}
@@ -42,7 +43,7 @@ func (u CreateOrder) Do(ctx context.Context, customerId, productId int64, delive
 		return 0, exception.ProductWithNoStock{Id: productId}
 	}
 	order := model.NewOrder(customerId, product, deliveryDate, deliveryAddress)
-	orderId, err := u.orderRepository.Create(ctx, order)
+	orderId, err := u.createOrderCmd.Do(ctx, order)
 	if err != nil {
 		log.WithFields(logger.Fields{"error": err, "order": order}).Errorf("error when create order")
 		return 0, err

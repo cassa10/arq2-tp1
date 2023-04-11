@@ -17,3 +17,7 @@ type UpdateProduct struct {
 	Price       float64 `json:"price" binding:"required,min=0"`
 	Category    string  `json:"category" binding:"required"`
 }
+
+type UpdateOrder struct {
+	State string `json:"state" binding:"required"`
+}

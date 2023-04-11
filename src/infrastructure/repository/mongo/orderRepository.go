@@ -112,7 +112,22 @@ func (r *orderRepository) FindById(ctx context.Context, id int64) (*model.Order,
 }
 
 func (r *orderRepository) Update(ctx context.Context, order model.Order) (bool, error) {
-	panic("not implemented yet")
+	log := r.logger.WithFields(logger.Fields{"method": "Update", "orderToUpdate": order})
+	timeout, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+
+	orderDTO := dto.NewOrderDTOFrom(order)
+	updateRes, err := r.db.Collection(orderCollection).UpdateByID(timeout, orderDTO.Id, bson.M{"$set": orderDTO})
+	if err != nil {
+		log.WithFields(logger.Fields{"error": err}).Error("error when update order")
+		return false, err
+	}
+	if updateRes.ModifiedCount == 0 {
+		log.Errorf("couldn't update order with id %v", order.Id)
+		return false, exception.OrderCannotUpdate{Id: order.Id}
+	}
+	log.Info("order updated successfully")
+	return true, nil
 }
 
 func (r *orderRepository) createIndexes(ctx context.Context) {

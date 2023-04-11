@@ -47,8 +47,11 @@ func main() {
 	searchProductQuery := query.NewSearchProduct(productRepo)
 
 	//order
-	createOrderUseCase := usecase.NewCreateOrder(baseLogger, orderRepo, *findProductByIdQuery, *findCustomerByIdQuery)
 	findOrderByIdQuery := query.NewFindOrderById(orderRepo)
+	createOrderCmd := command.NewCreateOrder(orderRepo)
+	confirmOrderCmd := command.NewConfirmOrder(orderRepo)
+	createOrderUseCase := usecase.NewCreateOrder(baseLogger, *createOrderCmd, *findProductByIdQuery, *findCustomerByIdQuery)
+	confirmOrderUseCase := usecase.NewConfirmOrder(baseLogger, *confirmOrderCmd, *findOrderByIdQuery)
 
 	app := api.NewApplication(baseLogger, conf, &api.ApplicationUseCases{
 		FindCustomerQuery: findCustomerByIdQuery,
@@ -67,8 +70,9 @@ func main() {
 		DeleteProductCmd:   deleteProductCmd,
 		SearchProductQuery: searchProductQuery,
 
-		CreateOrderUseCase: createOrderUseCase,
-		FindOrderQuery:     findOrderByIdQuery,
+		FindOrderQuery:      findOrderByIdQuery,
+		CreateOrderUseCase:  createOrderUseCase,
+		ConfirmOrderUseCase: confirmOrderUseCase,
 	})
 	baseLogger.Fatal(app.Run())
 }
