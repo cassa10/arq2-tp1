@@ -48,6 +48,7 @@ func main() {
 
 	//order
 	createOrderUseCase := usecase.NewCreateOrder(baseLogger, orderRepo, *findProductByIdQuery, *findCustomerByIdQuery)
+	findOrderByIdQuery := query.NewFindOrderById(orderRepo)
 
 	app := api.NewApplication(baseLogger, conf, &api.ApplicationUseCases{
 		FindCustomerQuery: findCustomerByIdQuery,
@@ -67,6 +68,7 @@ func main() {
 		SearchProductQuery: searchProductQuery,
 
 		CreateOrderUseCase: createOrderUseCase,
+		FindOrderQuery:     findOrderByIdQuery,
 	})
 	baseLogger.Fatal(app.Run())
 }

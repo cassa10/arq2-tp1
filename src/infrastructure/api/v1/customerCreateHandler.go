@@ -16,21 +16,21 @@ import (
 // @Tags         Customer
 // @Produce json
 // @Success 200 {object} dto.IdResponse
-// @Failure 400
-// @Failure 406
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 406 {object} dto.ErrorMessage
 // @Router       /api/v1/customer [post]
 func CreateCustomerHandler(log model.Logger, createCustomerCmd *command.CreateCustomer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request dto.CustomerCreateReq
 		if err := c.BindJSON(&request); err != nil {
-			c.JSON(http.StatusBadRequest, dto.NewErrorMessageComplete("invalid json body customer", err.Error()))
+			writeJsonErrorMessageInDescAndMessage(c, http.StatusBadRequest, "invalid json body customer create request", err)
 			return
 		}
 		customerId, err := createCustomerCmd.Do(c.Request.Context(), request.MapToModel())
 		if err != nil {
 			switch err.(type) {
 			case exception.CustomerAlreadyExistError:
-				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when create customer", err)
 			}

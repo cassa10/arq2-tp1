@@ -16,28 +16,28 @@ import (
 // @Tags         Order
 // @Produce json
 // @Success 200 {object} dto.IdResponse
-// @Failure 400
-// @Failure 404
-// @Failure 406
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 406 {object} dto.ErrorMessage
 // @Router       /api/v1/order [post]
 func CreateOrderHandler(log model.Logger, createOrder *usecase.CreateOrder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req dto.OrderCreateReq
 		if err := c.BindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, dto.NewErrorMessageComplete("invalid json body order", err.Error()))
+			writeJsonErrorMessageInDescAndMessage(c, http.StatusBadRequest, "invalid json body order create req", err)
 			return
 		}
 		if err := req.Validate(); err != nil {
-			writeJsonErrorMessage(c, http.StatusBadRequest, err)
+			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
 		orderId, err := createOrder.Do(c.Request.Context(), req.CustomerId, req.ProductId, req.DeliveryDate, req.DeliveryAddress)
 		if err != nil {
 			switch err.(type) {
 			case exception.CustomerNotFoundErr, exception.ProductNotFoundErr:
-				writeJsonErrorMessage(c, http.StatusNotFound, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.ProductWithNoStock:
-				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when create order", err)
 			}

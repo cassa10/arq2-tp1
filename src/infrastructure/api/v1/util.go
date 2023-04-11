@@ -10,11 +10,6 @@ import (
 	"strconv"
 )
 
-func defaultInternalServerError(log model.Logger, ginContext *gin.Context, additionalLogInfo string, err error) {
-	log.WithFields(logger.Fields{"error": err}).Error(additionalLogInfo)
-	ginContext.JSON(http.StatusInternalServerError, dto.NewErrorMessage("internal server error"))
-}
-
 func parsePathParamPositiveIntId(c *gin.Context, paramKey string) (int64, error) {
 	_idParam, _ := c.Params.Get(paramKey)
 	id, err := strconv.ParseInt(_idParam, 10, 64)
@@ -24,6 +19,19 @@ func parsePathParamPositiveIntId(c *gin.Context, paramKey string) (int64, error)
 	return id, err
 }
 
-func writeJsonErrorMessage(c *gin.Context, status int, err error) {
-	c.JSON(status, dto.NewErrorMessage(err.Error()))
+func defaultInternalServerError(log model.Logger, ginContext *gin.Context, additionalLogInfo string, err error) {
+	log.WithFields(logger.Fields{"error": err}).Error(additionalLogInfo)
+	_writeJsonErrorMessageWithDesc(ginContext, http.StatusInternalServerError, "internal server error", "")
+}
+
+func writeJsonErrorMessageWithNoDesc(c *gin.Context, status int, err error) {
+	_writeJsonErrorMessageWithDesc(c, status, err.Error(), "")
+}
+
+func writeJsonErrorMessageInDescAndMessage(c *gin.Context, status int, msg string, err error) {
+	_writeJsonErrorMessageWithDesc(c, status, msg, err.Error())
+}
+
+func _writeJsonErrorMessageWithDesc(c *gin.Context, status int, message, desc string) {
+	c.JSON(status, dto.NewErrorMessage(message, desc))
 }

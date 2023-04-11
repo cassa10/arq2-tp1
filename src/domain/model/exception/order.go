@@ -9,3 +9,19 @@ type CannotMapOrderState struct {
 func (e CannotMapOrderState) Error() string {
 	return fmt.Sprintf("cannot map order state %s", e.State)
 }
+
+type OrderNotFoundErr struct {
+	Id int64
+}
+
+func (e OrderNotFoundErr) Error() string {
+	return fmt.Sprintf("order with id %v not found", e.Id)
+}
+
+type OrderCannotUpdate struct {
+	Id int64
+}
+
+func (e OrderCannotUpdate) Error() string {
+	return fmt.Sprintf("order with id %v cannot update", e.Id)
+}

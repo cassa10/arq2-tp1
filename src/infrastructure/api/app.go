@@ -56,6 +56,7 @@ type ApplicationUseCases struct {
 	SearchProductQuery *query.SearchProduct
 	//order
 	CreateOrderUseCase *usecase.CreateOrder
+	FindOrderQuery     *query.FindOrderById
 }
 
 func NewApplication(l model.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
@@ -101,7 +102,7 @@ func (app *application) Run() error {
 	{
 		rv1Order := rv1.Group("/order")
 		rv1Order.POST("", v1.CreateOrderHandler(app.logger, app.CreateOrderUseCase))
-		//rv1Order.GET("/:orderId", v1.FindOrderHandler(app.logger, app.FindOrderQuery))
+		rv1Order.GET("/:orderId", v1.FindOrderHandler(app.logger, app.FindOrderQuery))
 		//rv1Order.POST("/:orderId/confirm", v1.ConfirmOrderHandler(app.logger, app.ConfirmOrderUseCase))
 		//rv1Order.POST("/:orderId/delivered", v1.DeliveredOrderHandler(app.logger, app.DeliveredOrderUseCase))
 	}

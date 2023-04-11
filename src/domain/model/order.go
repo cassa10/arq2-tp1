@@ -56,5 +56,4 @@ type OrderRepository interface {
 	FindById(ctx context.Context, id int64) (*Order, error)
 	Create(ctx context.Context, order Order) (int64, error)
 	Update(ctx context.Context, order Order) (bool, error)
-	Delete(ctx context.Context, id int64) (bool, error)
 }

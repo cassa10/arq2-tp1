@@ -20,17 +20,17 @@ import (
 // @Tags         Product
 // @Produce json
 // @Success 200 {object} dto.ProductSearchResponse
-// @Failure 400
+// @Failure 400 {object} dto.ErrorMessage
 // @Router       /api/v1/seller/product/search [get]
 func SearchProductHandler(log model.Logger, searchProductQuery *query.SearchProduct) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var qs dto.ProductSearchQueryReq
 		if err := c.ShouldBindQuery(&qs); err != nil {
-			writeJsonErrorMessage(c, http.StatusBadRequest, err)
+			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
 		if err := qs.ValidateReq(); err != nil {
-			writeJsonErrorMessage(c, http.StatusBadRequest, err)
+			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
 		products, paging, err := searchProductQuery.Do(c.Request.Context(), qs.GetProductSearchFilter(), qs.GetPageRequest())

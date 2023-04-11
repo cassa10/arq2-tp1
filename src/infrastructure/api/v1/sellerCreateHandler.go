@@ -16,21 +16,21 @@ import (
 // @Tags         Seller
 // @Produce json
 // @Success 200 {object} dto.IdResponse
-// @Failure 400
-// @Failure 406
-// @Router       /api/v1/seller [post]
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 406 {object} dto.ErrorMessage
+// @Router		/api/v1/seller [post]
 func CreateSellerHandler(log model.Logger, createSellerCmd *command.CreateSeller) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request dto.SellerCreateReq
 		if err := c.BindJSON(&request); err != nil {
-			c.JSON(http.StatusBadRequest, dto.NewErrorMessageComplete("invalid json body seller", err.Error()))
+			writeJsonErrorMessageInDescAndMessage(c, http.StatusBadRequest, "invalid json body seller create request", err)
 			return
 		}
 		sellerId, err := createSellerCmd.Do(c.Request.Context(), request.MapToModel())
 		if err != nil {
 			switch err.(type) {
 			case exception.SellerAlreadyExistError:
-				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when create seller", err)
 			}

@@ -12,29 +12,29 @@ import (
 // DeleteSellerHandler
 // @Summary      Endpoint delete seller
 // @Description  delete seller by id
-// @Param sellerId path int true "Seller ID"
+// @Param sellerId path int true "Seller ID" minimum(1)
 // @Tags         Seller
 // @Produce json
 // @Success 204
-// @Failure 400
-// @Failure 404
-// @Failure 406
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 406 {object} dto.ErrorMessage
 // @Router       /api/v1/seller/{sellerId} [delete]
 func DeleteSellerHandler(log model.Logger, deleteSellerCmd *command.DeleteSeller) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "sellerId")
 		if err != nil {
 			log.WithFields(logger.Fields{"error": err}).Error("invalid path param")
-			writeJsonErrorMessage(c, http.StatusBadRequest, err)
+			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
 		err = deleteSellerCmd.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
 			case exception.SellerNotFoundErr:
-				writeJsonErrorMessage(c, http.StatusNotFound, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.SellerCannotDelete:
-				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when delete seller", err)
 			}

@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
 	"github.com/cassa10/arq2-tp1/src/infrastructure/dto"
@@ -33,7 +34,7 @@ func NewOrderRepository(baseLogger model.Logger, db *mongo.Database, timeout tim
 }
 
 func (r *orderRepository) Create(ctx context.Context, order model.Order) (int64, error) {
-	log := r.logger.WithFields(logger.Fields{"order": order})
+	log := r.logger.WithFields(logger.Fields{"method": "Create", "order": order})
 	timeoutCtx, cf := context.WithTimeout(ctx, r.timeout)
 	defer cf()
 	client := r.db.Client()
@@ -90,11 +91,24 @@ func (r *orderRepository) Create(ctx context.Context, order model.Order) (int64,
 }
 
 func (r *orderRepository) FindById(ctx context.Context, id int64) (*model.Order, error) {
-	panic("not implemented yet")
-}
-
-func (r *orderRepository) Delete(ctx context.Context, id int64) (bool, error) {
-	panic("not implemented yet")
+	log := r.logger.WithFields(logger.Fields{"method": "FindById", "id": id})
+	filter := bson.M{"_id": id}
+	timeout, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+	var orderDTO dto.OrderDTO
+	if err := r.db.Collection(orderCollection).FindOne(timeout, filter).Decode(&orderDTO); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, exception.OrderNotFoundErr{Id: id}
+		}
+		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
+		return nil, err
+	}
+	order, err := orderDTO.Map()
+	if err != nil {
+		log.WithFields(logger.Fields{"error": err}).Errorf("error when map order dto to model order")
+		return nil, err
+	}
+	return &order, nil
 }
 
 func (r *orderRepository) Update(ctx context.Context, order model.Order) (bool, error) {

@@ -12,29 +12,29 @@ import (
 // DeleteCustomerHandler
 // @Summary      Endpoint delete customer
 // @Description  delete customer by id
-// @Param customerId path int true "Customer ID"
+// @Param customerId path int true "Customer ID" minimum(1)
 // @Tags         Customer
 // @Produce json
 // @Success 204
-// @Failure 400
-// @Failure 404
-// @Failure 406
+// @Failure 400 {object} dto.ErrorMessage
+// @Failure 404 {object} dto.ErrorMessage
+// @Failure 406 {object} dto.ErrorMessage
 // @Router       /api/v1/customer/{customerId} [delete]
 func DeleteCustomerHandler(log model.Logger, deleteCustomerCmd *command.DeleteCustomer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "customerId")
 		if err != nil {
 			log.WithFields(logger.Fields{"error": err}).Error("invalid path param")
-			writeJsonErrorMessage(c, http.StatusBadRequest, err)
+			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
 		err = deleteCustomerCmd.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
 			case exception.CustomerNotFoundErr:
-				writeJsonErrorMessage(c, http.StatusNotFound, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.CustomerCannotDelete:
-				writeJsonErrorMessage(c, http.StatusNotAcceptable, err)
+				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when delete customer", err)
 			}
