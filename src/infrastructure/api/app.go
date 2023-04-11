@@ -55,9 +55,10 @@ type ApplicationUseCases struct {
 	FindProductQuery   *query.FindProductById
 	SearchProductQuery *query.SearchProduct
 	//order
-	FindOrderQuery      *query.FindOrderById
-	CreateOrderUseCase  *usecase.CreateOrder
-	ConfirmOrderUseCase *usecase.ConfirmOrder
+	FindOrderQuery        *query.FindOrderById
+	CreateOrderUseCase    *usecase.CreateOrder
+	ConfirmOrderUseCase   *usecase.ConfirmOrder
+	DeliveredOrderUseCase *usecase.DeliveredOrder
 }
 
 func NewApplication(l model.Logger, conf config.Config, applicationUseCases *ApplicationUseCases) Application {
@@ -105,7 +106,7 @@ func (app *application) Run() error {
 		rv1Order.POST("", v1.CreateOrderHandler(app.logger, app.CreateOrderUseCase))
 		rv1Order.GET("/:orderId", v1.FindOrderHandler(app.logger, app.FindOrderQuery))
 		rv1Order.POST("/:orderId/confirm", v1.ConfirmOrderHandler(app.logger, app.ConfirmOrderUseCase))
-		//rv1Order.POST("/:orderId/delivered", v1.DeliveredOrderHandler(app.logger, app.DeliveredOrderUseCase))
+		rv1Order.POST("/:orderId/delivered", v1.DeliveredOrderHandler(app.logger, app.DeliveredOrderUseCase))
 	}
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

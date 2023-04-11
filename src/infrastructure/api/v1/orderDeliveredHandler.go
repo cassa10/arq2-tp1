@@ -9,9 +9,9 @@ import (
 	"net/http"
 )
 
-// ConfirmOrderHandler
-// @Summary      Endpoint confirm order
-// @Description  confirm an order
+// DeliveredOrderHandler
+// @Summary      Endpoint delivered order
+// @Description  delivered an order
 // @Param orderId path int true "Order ID" minimum(1)
 // @Tags         Order
 // @Produce json
@@ -20,8 +20,8 @@ import (
 // @Failure 404 {object} dto.ErrorMessage
 // @Failure 406 {object} dto.ErrorMessage
 // @Failure 500 {object} dto.ErrorMessage
-// @Router       /api/v1/order/{orderId}/confirm [post]
-func ConfirmOrderHandler(log model.Logger, confirmOrderUseCase *usecase.ConfirmOrder) gin.HandlerFunc {
+// @Router       /api/v1/order/{orderId}/delivered [post]
+func DeliveredOrderHandler(log model.Logger, deliveredOrderUseCase *usecase.DeliveredOrder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parsePathParamPositiveIntId(c, "orderId")
 		if err != nil {
@@ -29,7 +29,7 @@ func ConfirmOrderHandler(log model.Logger, confirmOrderUseCase *usecase.ConfirmO
 			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
-		err = confirmOrderUseCase.Do(c.Request.Context(), id)
+		err = deliveredOrderUseCase.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
 			case exception.OrderNotFoundErr:
@@ -39,7 +39,7 @@ func ConfirmOrderHandler(log model.Logger, confirmOrderUseCase *usecase.ConfirmO
 			case exception.CannotMapOrderState:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusInternalServerError, err)
 			default:
-				defaultInternalServerError(log, c, "uncaught error when confirm order", err)
+				defaultInternalServerError(log, c, "uncaught error when delivered order", err)
 			}
 			return
 		}
