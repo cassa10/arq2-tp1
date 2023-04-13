@@ -5,16 +5,16 @@ import (
 	"github.com/cassa10/arq2-tp1/src/domain/model"
 )
 
-type SearchProduct struct {
+type SearchProducts struct {
 	productRepo model.ProductRepository
 }
 
-func NewSearchProduct(productRepo model.ProductRepository) *SearchProduct {
-	return &SearchProduct{
+func NewSearchProducts(productRepo model.ProductRepository) *SearchProducts {
+	return &SearchProducts{
 		productRepo: productRepo,
 	}
 }
 
-func (q SearchProduct) Do(ctx context.Context, filters model.ProductSearchFilter, pagingReq model.PagingRequest) ([]model.Product, model.Paging, error) {
+func (q SearchProducts) Do(ctx context.Context, filters model.ProductSearchFilter, pagingReq model.PagingRequest) ([]model.Product, model.Paging, error) {
 	return q.productRepo.Search(ctx, filters, pagingReq)
 }

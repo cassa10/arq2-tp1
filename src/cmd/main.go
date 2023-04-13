@@ -44,7 +44,7 @@ func main() {
 	createProductCmd := command.NewCreateProduct(productRepo, *findSellerByIdQuery)
 	updateProductCmd := command.NewUpdateProduct(productRepo, *findProductByIdQuery)
 	deleteProductCmd := command.NewDeleteProduct(productRepo, *findProductByIdQuery)
-	searchProductQuery := query.NewSearchProduct(productRepo)
+	searchProductQuery := query.NewSearchProducts(productRepo)
 
 	//order
 	findOrderByIdQuery := query.NewFindOrderById(orderRepo)
@@ -67,11 +67,11 @@ func main() {
 		UpdateSellerCmd: updateSellerCmd,
 		DeleteSellerCmd: deleteSellerCmd,
 
-		FindProductQuery:   findProductByIdQuery,
-		CreateProductCmd:   createProductCmd,
-		UpdateProductCmd:   updateProductCmd,
-		DeleteProductCmd:   deleteProductCmd,
-		SearchProductQuery: searchProductQuery,
+		FindProductQuery:    findProductByIdQuery,
+		CreateProductCmd:    createProductCmd,
+		UpdateProductCmd:    updateProductCmd,
+		DeleteProductCmd:    deleteProductCmd,
+		SearchProductsQuery: searchProductQuery,
 
 		FindOrderQuery:        findOrderByIdQuery,
 		CreateOrderUseCase:    createOrderUseCase,

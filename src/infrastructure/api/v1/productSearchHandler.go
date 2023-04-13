@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// SearchProductHandler
+// SearchProductsHandler
 // @Summary      Endpoint search products
 // @Description  update product
 // @Param        page    		query	integer	false	"page request"  		minimum(0) maximum(9999999999999)
@@ -22,7 +22,7 @@ import (
 // @Success 200 {object} dto.ProductSearchResponse
 // @Failure 400 {object} dto.ErrorMessage
 // @Router       /api/v1/seller/product/search [get]
-func SearchProductHandler(log model.Logger, searchProductQuery *query.SearchProduct) gin.HandlerFunc {
+func SearchProductsHandler(log model.Logger, searchProductsQuery *query.SearchProducts) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var qs dto.ProductSearchQueryReq
 		if err := c.ShouldBindQuery(&qs); err != nil {
@@ -33,7 +33,7 @@ func SearchProductHandler(log model.Logger, searchProductQuery *query.SearchProd
 			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
-		products, paging, err := searchProductQuery.Do(c.Request.Context(), qs.GetProductSearchFilter(), qs.MapToPageRequest())
+		products, paging, err := searchProductsQuery.Do(c.Request.Context(), qs.GetProductSearchFilter(), qs.MapToPageRequest())
 		if err != nil {
 			defaultInternalServerError(log, c, "uncaught error when update product", err)
 			return
