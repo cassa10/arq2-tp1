@@ -1,5 +1,6 @@
 package model
 
+//go:generate mockgen -destination=../mock/logger.go -package=mock -source=logger.go
 type Logger interface {
 	WithFields(map[string]interface{}) Logger
 	Print(...interface{})
