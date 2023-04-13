@@ -37,7 +37,7 @@ func CreateProductHandler(log model.Logger, createProductCmd *command.CreateProd
 		productId, err := createProductCmd.Do(c.Request.Context(), request.MapToModel(sellerId))
 		if err != nil {
 			switch err.(type) {
-			case exception.SellerNotFoundErr:
+			case exception.SellerNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when create product", err)

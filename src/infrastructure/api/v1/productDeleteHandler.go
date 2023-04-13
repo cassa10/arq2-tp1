@@ -31,7 +31,7 @@ func DeleteProductHandler(log model.Logger, deleteProductCmd *command.DeleteProd
 		err = deleteProductCmd.Do(c.Request.Context(), productId)
 		if err != nil {
 			switch err.(type) {
-			case exception.ProductNotFoundErr:
+			case exception.ProductNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.ProductCannotDelete:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)

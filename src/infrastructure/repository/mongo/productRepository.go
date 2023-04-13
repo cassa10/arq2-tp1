@@ -39,7 +39,7 @@ func (r *productRepository) FindById(ctx context.Context, id int64) (*model.Prod
 	var product model.Product
 	if err := r.db.Collection(productCollection).FindOne(timeout, filter).Decode(&product); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.ProductNotFoundErr{Id: id}
+			return nil, exception.ProductNotFound{Id: id}
 		}
 		log.WithFields(logger.Fields{"err": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err
@@ -136,13 +136,13 @@ func (r *productRepository) Search(ctx context.Context, searchFilters model.Prod
 	total, err := r.db.Collection(productCollection).CountDocuments(ctx, filter)
 	if err != nil {
 		log.WithFields(logger.Fields{"error": err}).Error("error when count documents for paging")
-		return products, model.EmptyPage(), err
+		return products, model.NewEmptyPage(), err
 	}
 	totalPages := int(math.Ceil(float64(total) / float64(pagingReq.Size)))
 	skip := pagingReq.Size * (pagingReq.Page)
 	limit := pagingReq.Size
 
-	emptyPage := model.EmptyPage()
+	emptyPage := model.NewEmptyPage()
 	opts := options.Find().SetSkip(int64(skip)).SetLimit(int64(limit))
 	cur, err := r.db.Collection(productCollection).Find(timeout, filter, opts)
 	if err != nil {

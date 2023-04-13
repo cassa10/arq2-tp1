@@ -30,7 +30,7 @@ func FindProductHandler(log model.Logger, findProductByIdQuery *query.FindProduc
 		product, err := findProductByIdQuery.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.ProductNotFoundErr:
+			case exception.ProductNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when find product", err)

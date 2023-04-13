@@ -10,11 +10,11 @@ func (e CannotMapOrderState) Error() string {
 	return fmt.Sprintf("cannot map order state %s", e.State)
 }
 
-type OrderNotFoundErr struct {
+type OrderNotFound struct {
 	Id int64
 }
 
-func (e OrderNotFoundErr) Error() string {
+func (e OrderNotFound) Error() string {
 	return fmt.Sprintf("order with id %v not found", e.Id)
 }
 

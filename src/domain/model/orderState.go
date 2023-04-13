@@ -6,15 +6,15 @@ import (
 )
 
 const (
-	pendingState   = "PENDING"
-	confirmedState = "CONFIRMED"
-	deliveredState = "DELIVERED"
+	pendingOrderState   = "PENDING"
+	confirmedOrderState = "CONFIRMED"
+	deliveredOrderState = "DELIVERED"
 )
 
 var stateMapper = map[string]OrderState{
-	pendingState:   PendingOrderState{},
-	confirmedState: ConfirmedOrderState{},
-	deliveredState: DeliveredOrderState{},
+	pendingOrderState:   PendingOrderState{},
+	confirmedOrderState: ConfirmedOrderState{},
+	deliveredOrderState: DeliveredOrderState{},
 }
 
 type OrderState interface {
@@ -23,16 +23,7 @@ type OrderState interface {
 	// Delivered returns true when order mutates
 	Delivered(order *Order) bool
 	String() string
-	UnmarshalJSON(b []byte) error
 	MarshalJSON() ([]byte, error)
-}
-
-func unmarshalJSONOrderState(orderState OrderState, b []byte) error {
-	state := orderState.String()
-	if err := json.Unmarshal(b, &state); err != nil {
-		return err
-	}
-	return nil
 }
 
 func marshalJSONOrderState(orderState OrderState) ([]byte, error) {
@@ -51,11 +42,7 @@ func (pS PendingOrderState) Delivered(_ *Order) bool {
 }
 
 func (pS PendingOrderState) String() string {
-	return pendingState
-}
-
-func (pS PendingOrderState) UnmarshalJSON(b []byte) error {
-	return unmarshalJSONOrderState(pS, b)
+	return pendingOrderState
 }
 
 func (pS PendingOrderState) MarshalJSON() ([]byte, error) {
@@ -74,11 +61,7 @@ func (cS ConfirmedOrderState) Delivered(order *Order) bool {
 }
 
 func (cS ConfirmedOrderState) String() string {
-	return confirmedState
-}
-
-func (cS ConfirmedOrderState) UnmarshalJSON(b []byte) error {
-	return unmarshalJSONOrderState(cS, b)
+	return confirmedOrderState
 }
 
 func (cS ConfirmedOrderState) MarshalJSON() ([]byte, error) {
@@ -96,11 +79,7 @@ func (dS DeliveredOrderState) Delivered(_ *Order) bool {
 }
 
 func (dS DeliveredOrderState) String() string {
-	return deliveredState
-}
-
-func (dS DeliveredOrderState) UnmarshalJSON(b []byte) error {
-	return unmarshalJSONOrderState(dS, b)
+	return deliveredOrderState
 }
 
 func (dS DeliveredOrderState) MarshalJSON() ([]byte, error) {

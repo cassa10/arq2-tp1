@@ -98,7 +98,7 @@ func (r *orderRepository) FindById(ctx context.Context, id int64) (*model.Order,
 	var orderDTO dto.OrderDTO
 	if err := r.db.Collection(orderCollection).FindOne(timeout, filter).Decode(&orderDTO); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.OrderNotFoundErr{Id: id}
+			return nil, exception.OrderNotFound{Id: id}
 		}
 		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err

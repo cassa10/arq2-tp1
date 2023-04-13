@@ -30,7 +30,7 @@ func FindCustomerHandler(log model.Logger, findCustomerQuery *query.FindCustomer
 		customer, err := findCustomerQuery.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.CustomerNotFoundErr:
+			case exception.CustomerNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when find customer", err)

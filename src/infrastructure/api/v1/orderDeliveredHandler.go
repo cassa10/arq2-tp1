@@ -32,7 +32,7 @@ func DeliveredOrderHandler(log model.Logger, deliveredOrderUseCase *usecase.Deli
 		err = deliveredOrderUseCase.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.OrderNotFoundErr:
+			case exception.OrderNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.OrderInvalidTransitionState:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)

@@ -37,9 +37,9 @@ func UpdateSellerHandler(log model.Logger, updateSellerCmd *command.UpdateSeller
 		err = updateSellerCmd.Do(c.Request.Context(), id, request)
 		if err != nil {
 			switch err.(type) {
-			case exception.SellerNotFoundErr:
+			case exception.SellerNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
-			case exception.SellerCannotUpdate, exception.SellerAlreadyExistError:
+			case exception.SellerCannotUpdate, exception.SellerAlreadyExist:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when update seller", err)

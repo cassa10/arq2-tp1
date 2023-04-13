@@ -31,7 +31,7 @@ func DeleteCustomerHandler(log model.Logger, deleteCustomerCmd *command.DeleteCu
 		err = deleteCustomerCmd.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.CustomerNotFoundErr:
+			case exception.CustomerNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.CustomerCannotDelete:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)

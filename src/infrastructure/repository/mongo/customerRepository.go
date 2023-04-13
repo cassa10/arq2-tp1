@@ -38,7 +38,7 @@ func (r *customerRepository) FindById(ctx context.Context, id int64) (*model.Cus
 	var customer model.Customer
 	if err := r.db.Collection(customerCollection).FindOne(timeout, filter).Decode(&customer); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.CustomerNotFoundErr{Id: id}
+			return nil, exception.CustomerNotFound{Id: id}
 		}
 		log.WithFields(logger.Fields{"err": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err
@@ -54,7 +54,7 @@ func (r *customerRepository) FindByEmail(ctx context.Context, email string) (*mo
 	var customer model.Customer
 	if err := r.db.Collection(customerCollection).FindOne(timeout, filter).Decode(&customer); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.CustomerNotFoundErr{Email: email}
+			return nil, exception.CustomerNotFound{Email: email}
 		}
 		log.WithFields(logger.Fields{"err": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err
@@ -65,9 +65,9 @@ func (r *customerRepository) FindByEmail(ctx context.Context, email string) (*mo
 func (r *customerRepository) Create(ctx context.Context, customer model.Customer) (int64, error) {
 	log := r.logger.WithFields(logger.Fields{"method": "Create"})
 	_, err := r.FindByEmail(ctx, customer.Email)
-	if _, customerNotExist := err.(exception.CustomerNotFoundErr); !customerNotExist {
+	if _, customerNotExist := err.(exception.CustomerNotFound); !customerNotExist {
 		log.Infof("customer already exist")
-		return 0, exception.CustomerAlreadyExistError{Email: customer.Email}
+		return 0, exception.CustomerAlreadyExist{Email: customer.Email}
 	}
 
 	timeoutCtx, cf := context.WithTimeout(ctx, r.timeout)
@@ -82,7 +82,7 @@ func (r *customerRepository) Create(ctx context.Context, customer model.Customer
 	if _, err := r.db.Collection(customerCollection).InsertOne(timeoutCtx, customer); err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Infof("customer already exist")
-			return 0, exception.CustomerAlreadyExistError{Email: customer.Email}
+			return 0, exception.CustomerAlreadyExist{Email: customer.Email}
 		}
 		log.WithFields(logger.Fields{"err": err}).Error("couldn't create customer")
 		return 0, err
@@ -99,7 +99,7 @@ func (r *customerRepository) Update(ctx context.Context, customer model.Customer
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Infof("customer with new email already exist")
-			return false, exception.CustomerAlreadyExistError{Email: customer.Email}
+			return false, exception.CustomerAlreadyExist{Email: customer.Email}
 		}
 		log.WithFields(logger.Fields{"error": err}).Error("error when update customer")
 		return false, err

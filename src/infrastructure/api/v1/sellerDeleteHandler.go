@@ -31,7 +31,7 @@ func DeleteSellerHandler(log model.Logger, deleteSellerCmd *command.DeleteSeller
 		err = deleteSellerCmd.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.SellerNotFoundErr:
+			case exception.SellerNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.SellerCannotDelete:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)

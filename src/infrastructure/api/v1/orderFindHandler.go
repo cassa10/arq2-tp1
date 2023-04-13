@@ -32,7 +32,7 @@ func FindOrderHandler(log model.Logger, findOrderByIdQuery *query.FindOrderById)
 		order, err := findOrderByIdQuery.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.OrderNotFoundErr:
+			case exception.OrderNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.CannotMapOrderState:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusInternalServerError, err)

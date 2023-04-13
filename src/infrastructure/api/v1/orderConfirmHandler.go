@@ -32,7 +32,7 @@ func ConfirmOrderHandler(log model.Logger, confirmOrderUseCase *usecase.ConfirmO
 		err = confirmOrderUseCase.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.OrderNotFoundErr:
+			case exception.OrderNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.OrderInvalidTransitionState:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)

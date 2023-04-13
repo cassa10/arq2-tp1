@@ -4,6 +4,11 @@ import (
 	"github.com/cassa10/arq2-tp1/src/domain/util"
 )
 
+const (
+	priceMinDefault = float64(0)
+	priceMaxDefault = float64(999999999999999999)
+)
+
 type ProductSearchFilter struct {
 	Name     string   `json:"name"`
 	Category string   `json:"category"`
@@ -26,14 +31,14 @@ func (f *ProductSearchFilter) ContainsAnyPriceFilter() bool {
 
 func (f *ProductSearchFilter) GetPriceMinOrDefault() float64 {
 	if f.PriceMin == nil {
-		return 0
+		return priceMinDefault
 	}
 	return *f.PriceMin
 }
 
 func (f *ProductSearchFilter) GetPriceMaxOrDefault() float64 {
 	if f.PriceMax == nil {
-		return 999999999999999999
+		return priceMaxDefault
 	}
 	return *f.PriceMax
 }

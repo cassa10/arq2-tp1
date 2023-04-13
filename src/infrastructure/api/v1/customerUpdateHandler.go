@@ -37,9 +37,9 @@ func UpdateCustomerHandler(log model.Logger, updateCustomerCmd *command.UpdateCu
 		err = updateCustomerCmd.Do(c.Request.Context(), id, request)
 		if err != nil {
 			switch err.(type) {
-			case exception.CustomerNotFoundErr:
+			case exception.CustomerNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
-			case exception.CustomerCannotUpdate, exception.CustomerAlreadyExistError:
+			case exception.CustomerCannotUpdate, exception.CustomerAlreadyExist:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when update customer", err)

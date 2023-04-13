@@ -2,16 +2,12 @@ package exception
 
 import "fmt"
 
-type ProductNotFoundErr struct {
-	Id   int64
-	Name string
+type ProductNotFound struct {
+	Id int64
 }
 
-func (e ProductNotFoundErr) Error() string {
-	if e.Id != 0 {
-		return fmt.Sprintf("product with id %v not found", e.Id)
-	}
-	return fmt.Sprintf("product with name %v not found", e.Name)
+func (e ProductNotFound) Error() string {
+	return fmt.Sprintf("product with id %v not found", e.Id)
 }
 
 type ProductCannotDelete struct {

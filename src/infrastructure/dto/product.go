@@ -54,7 +54,3 @@ func (qs ProductSearchQueryReq) ValidateReq() error {
 func (qs ProductSearchQueryReq) GetProductSearchFilter() model.ProductSearchFilter {
 	return model.NewProductSearchFilter(qs.Name, qs.Category, qs.PriceMin, qs.PriceMax)
 }
-
-func (qs ProductSearchQueryReq) GetPageRequest() model.PagingRequest {
-	return model.PagingRequest{Page: qs.GetPage(), Size: qs.GetSize()}
-}

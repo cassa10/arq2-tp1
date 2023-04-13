@@ -29,7 +29,7 @@ func CreateSellerHandler(log model.Logger, createSellerCmd *command.CreateSeller
 		sellerId, err := createSellerCmd.Do(c.Request.Context(), request.MapToModel())
 		if err != nil {
 			switch err.(type) {
-			case exception.SellerAlreadyExistError:
+			case exception.SellerAlreadyExist:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when create seller", err)

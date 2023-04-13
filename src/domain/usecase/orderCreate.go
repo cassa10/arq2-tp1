@@ -38,7 +38,7 @@ func (u CreateOrder) Do(ctx context.Context, customerId, productId int64, delive
 		log.WithFields(logger.Fields{"error": err}).Errorf("error when find product")
 		return 0, err
 	}
-	if !product.ValidStock() {
+	if product.ReduceStock() {
 		log.Infof("product with stock %v is not available", product.Stock)
 		return 0, exception.ProductWithNoStock{Id: productId}
 	}

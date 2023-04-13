@@ -2,20 +2,20 @@ package exception
 
 import "fmt"
 
-type CustomerAlreadyExistError struct {
+type CustomerAlreadyExist struct {
 	Email string
 }
 
-func (e CustomerAlreadyExistError) Error() string {
+func (e CustomerAlreadyExist) Error() string {
 	return fmt.Sprintf("customer with email %s already exists", e.Email)
 }
 
-type CustomerNotFoundErr struct {
+type CustomerNotFound struct {
 	Id    int64
 	Email string
 }
 
-func (e CustomerNotFoundErr) Error() string {
+func (e CustomerNotFound) Error() string {
 	if e.Id != 0 {
 		return fmt.Sprintf("customer with id %v not found", e.Id)
 	}

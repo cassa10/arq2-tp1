@@ -22,8 +22,18 @@ func (p *Product) Merge(updateProduct UpdateProduct) {
 	p.Category = updateProduct.Category
 }
 
+// ValidStock returns true when: stock > 0
 func (p *Product) ValidStock() bool {
 	return p.Stock > 0
+}
+
+// ReduceStock if stock < 0 returns false; otherwise decrease in 1 product stock and returns true
+func (p *Product) ReduceStock() bool {
+	if !p.ValidStock() {
+		return false
+	}
+	p.Stock--
+	return true
 }
 
 func (p *Product) String() string {

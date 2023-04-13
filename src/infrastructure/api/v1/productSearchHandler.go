@@ -11,8 +11,8 @@ import (
 // SearchProductHandler
 // @Summary      Endpoint search products
 // @Description  update product
-// @Param        page    		query	integer	false	"page request"  		minimum(0) maximum(10000)
-// @Param        pageSize		query	integer	false	"pageSize request"  	minimum(1) maximum(200)
+// @Param        page    		query	integer	false	"page request"  		minimum(0) maximum(9999999999999)
+// @Param        pageSize		query	integer	false	"pageSize request"  	minimum(1) maximum(500)
 // @Param        name    		query	string	false	"filter by name"		example("name")
 // @Param        category   	query	string	false	"filter by category"	example("category")
 // @Param        priceMin    	query	number	false	"filter by min price"	minimum(0) maximum(999999999999999999)
@@ -33,7 +33,7 @@ func SearchProductHandler(log model.Logger, searchProductQuery *query.SearchProd
 			writeJsonErrorMessageWithNoDesc(c, http.StatusBadRequest, err)
 			return
 		}
-		products, paging, err := searchProductQuery.Do(c.Request.Context(), qs.GetProductSearchFilter(), qs.GetPageRequest())
+		products, paging, err := searchProductQuery.Do(c.Request.Context(), qs.GetProductSearchFilter(), qs.MapToPageRequest())
 		if err != nil {
 			defaultInternalServerError(log, c, "uncaught error when update product", err)
 			return

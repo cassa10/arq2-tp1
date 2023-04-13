@@ -29,7 +29,7 @@ func CreateCustomerHandler(log model.Logger, createCustomerCmd *command.CreateCu
 		customerId, err := createCustomerCmd.Do(c.Request.Context(), request.MapToModel())
 		if err != nil {
 			switch err.(type) {
-			case exception.CustomerAlreadyExistError:
+			case exception.CustomerAlreadyExist:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when create customer", err)

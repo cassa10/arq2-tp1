@@ -37,7 +37,7 @@ func UpdateProductHandler(log model.Logger, updateProductCmd *command.UpdateProd
 		err = updateProductCmd.Do(c.Request.Context(), id, request)
 		if err != nil {
 			switch err.(type) {
-			case exception.ProductNotFoundErr:
+			case exception.ProductNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			case exception.ProductCannotUpdate:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)

@@ -38,7 +38,7 @@ func (r *sellerRepository) FindById(ctx context.Context, id int64) (*model.Selle
 	var seller model.Seller
 	if err := r.db.Collection(sellerCollection).FindOne(timeout, filter).Decode(&seller); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.SellerNotFoundErr{Id: id}
+			return nil, exception.SellerNotFound{Id: id}
 		}
 		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err
@@ -54,7 +54,7 @@ func (r *sellerRepository) FindByName(ctx context.Context, name string) (*model.
 	var seller model.Seller
 	if err := r.db.Collection(sellerCollection).FindOne(timeout, filter).Decode(&seller); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.SellerNotFoundErr{Name: name}
+			return nil, exception.SellerNotFound{Name: name}
 		}
 		log.WithFields(logger.Fields{"error": err}).Errorf(fmt.Sprintf("couldn't retrieve documents with filter %s", filter))
 		return nil, err
@@ -66,9 +66,9 @@ func (r *sellerRepository) Create(ctx context.Context, seller model.Seller) (int
 	log := r.logger.WithFields(logger.Fields{"method": "Create"})
 
 	_, err := r.FindByName(ctx, seller.Name)
-	if _, sellerNotExist := err.(exception.SellerNotFoundErr); !sellerNotExist {
+	if _, sellerNotExist := err.(exception.SellerNotFound); !sellerNotExist {
 		log.Infof("seller already exist")
-		return 0, exception.SellerAlreadyExistError{Name: seller.Name}
+		return 0, exception.SellerAlreadyExist{Name: seller.Name}
 	}
 
 	timeoutCtx, cf := context.WithTimeout(ctx, r.timeout)
@@ -82,7 +82,7 @@ func (r *sellerRepository) Create(ctx context.Context, seller model.Seller) (int
 	if _, err := r.db.Collection(sellerCollection).InsertOne(timeoutCtx, seller); err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Infof("seller already exist")
-			return 0, exception.SellerAlreadyExistError{Name: seller.Name}
+			return 0, exception.SellerAlreadyExist{Name: seller.Name}
 		}
 		log.WithFields(logger.Fields{"error": err}).Error("couldn't create seller")
 		return 0, err
@@ -99,7 +99,7 @@ func (r *sellerRepository) Update(ctx context.Context, seller model.Seller) (boo
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Infof("seller with new name already exist")
-			return false, exception.SellerAlreadyExistError{Name: seller.Name}
+			return false, exception.SellerAlreadyExist{Name: seller.Name}
 		}
 		log.WithFields(logger.Fields{"error": err}).Error("couldn't update seller")
 		return false, err

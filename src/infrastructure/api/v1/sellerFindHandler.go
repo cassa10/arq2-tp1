@@ -30,7 +30,7 @@ func FindSellerHandler(log model.Logger, findSellerByIdQuery *query.FindSellerBy
 		seller, err := findSellerByIdQuery.Do(c.Request.Context(), id)
 		if err != nil {
 			switch err.(type) {
-			case exception.SellerNotFoundErr:
+			case exception.SellerNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when find seller", err)
