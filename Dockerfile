@@ -20,17 +20,18 @@ COPY /src  ./src/
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag init -g src/infrastructure/api/app.go
 
-# run tests and generate coverage files
-RUN go test -coverprofile="coverage.out" -covermode=atomic ./...
+# run tests and generate coverage files only domain
+RUN go test -coverprofile="coverage.out" -covermode=atomic ./src/domain/...
 
+# generate a readable file for percents of domain coverage
 RUN go install gitlab.com/fgmarand/gocoverstats@latest
-RUN gocoverstats -v -f coverage.out > coverage_rates.out
+RUN gocoverstats -v -f coverage.out -percent > coverage_rates.out
 
 WORKDIR /src/src/cmd
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o /arq2-tp1-app
 
 # final stage
-FROM gcr.io/distroless/static-debian11:latest
+FROM golang:1.20.2-alpine3.17
 
 COPY --from=build /arq2-tp1-app /app/
 COPY --from=build /src/coverage.out /app/coverage.out

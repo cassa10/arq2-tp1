@@ -14,21 +14,23 @@
 1) Ir al folder root del repositorio
 
 2) Ejecutar los comandos
+
 ```
-> go test -coverprofile="coverage.out" -covermode=atomic ./...
+> go test -coverprofile="coverage.out" -covermode=atomic ./src/domain/...
 > go install gitlab.com/fgmarand/gocoverstats@latest
-> gocoverstats -v -f coverage.out > coverage_rates.out
+> gocoverstats -v -f coverage.out -percent > coverage_rates.out
 ```
 
-3) Se generará el file coverage.out el cual contedrá el info del coverage, y 
-overage_rates.out que contendrá los porcentajes de coverage en decimales [0.0 - 1].
+3) Se generará el file coverage.out el cual contedrá el info del coverage del folder ./src/domain, y 
+overage_rates.out que contendrá los porcentajes dicho coverages.
 
 **Nota**: En la construcción de la imagen, se realiza la ejecucion de test y la generacion del coverage.
 Los archivos de coverage son almacenados dentro del container en la carpeta "/app". Es decir, que encontraremos:
 - /app/coverage.out
 - /app/coverage_rates.out
 
-Dichos archivos se pueden acceder desde docker desktop (recomendado), o bien, vinculando el filesystem del container con un volume y accediendo a dicho volume.
+Dichos archivos se pueden acceder desde un volume vinculado o sino ejecutando bash dentro del container los comando que se menciono anteriormente.
+
 
 ## Swagger
 
@@ -69,7 +71,7 @@ database = "arq-soft-2-meli"
 
 Nota: Pedir credenciales por privado.
 
-Tambien, si se desea se puede cambiar las envs por otras de las que estan.
+Tambien, si se desea se puede cambiar las envs por otras de las que estan. Se recomienda utilizar el mismo puerto externo e interno para que funcione correctamente swagger.
 
 ```
 docker run -p <port>:8080 --env-file ./resources/local.env --name arq2-tp1 arq2-tp1
@@ -84,7 +86,7 @@ docker run -d -p <port>:8080 --env-file ./resources/local.env --name arq2-tp1 ar
 Ejemplo:
 
 ```
-docker run -d -p 8082:8080 --env-file ./resources/local.env --name arq2-tp1 arq2-tp1
+docker run -d -p 8080:8080 --env-file ./resources/local.env --name arq2-tp1 arq2-tp1
 ```
 
 4) En un browser, abrir swagger del servicio en el siguiente url:
@@ -93,7 +95,7 @@ docker run -d -p 8082:8080 --env-file ./resources/local.env --name arq2-tp1 arq2
 
 Segun el ejemplo:
 
-`http://localhost:8082/docs/index.html`
+`http://localhost:8080/docs/index.html`
 
 5) Probar el endpoint health check y debe retornar ok
 

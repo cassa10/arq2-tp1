@@ -121,8 +121,12 @@ func (app *application) Run() error {
 // @Tags Health check
 // @Accept */*
 // @Produce json
-// @Success 200 {object} map[string]interface{}
+// @Success 200 {object} HealthCheckRes
 // @Router / [get]
 func HealthCheck(c *gin.Context) {
-	c.JSON(http.StatusOK, map[string]interface{}{"data": "Server is up and running"})
+	c.JSON(http.StatusOK, HealthCheckRes{Data: "Server is up and running"})
+}
+
+type HealthCheckRes struct {
+	Data string `json:"data"`
 }
