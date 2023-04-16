@@ -17,8 +17,8 @@ func NewDeliveredOrder(orderRepo model.OrderRepository) *DeliveredOrder {
 }
 
 func (c DeliveredOrder) Do(ctx context.Context, order *model.Order) error {
-	delivered := order.Delivered()
-	if !delivered {
+	ok := order.Delivered()
+	if !ok {
 		return exception.OrderInvalidTransitionState{Id: order.Id}
 	}
 	if _, err := c.orderRepo.Update(ctx, *order); err != nil {

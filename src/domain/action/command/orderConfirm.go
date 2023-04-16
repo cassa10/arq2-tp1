@@ -17,8 +17,8 @@ func NewConfirmOrder(orderRepo model.OrderRepository) *ConfirmOrder {
 }
 
 func (c ConfirmOrder) Do(ctx context.Context, order *model.Order) error {
-	confirmed := order.Confirm()
-	if !confirmed {
+	ok := order.Confirm()
+	if !ok {
 		return exception.OrderInvalidTransitionState{Id: order.Id}
 	}
 	if _, err := c.orderRepo.Update(ctx, *order); err != nil {
