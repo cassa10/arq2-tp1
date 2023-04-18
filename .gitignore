@@ -21,3 +21,6 @@ vendor/
 
 # swagger
 docs/
+
+# personal envs
+personal.env

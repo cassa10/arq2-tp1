@@ -46,6 +46,7 @@ type ProductRepository interface {
 	Create(ctx context.Context, product Product) (int64, error)
 	Update(ctx context.Context, product Product) (bool, error)
 	Delete(ctx context.Context, id int64) (bool, error)
+	DeleteAllBySellerId(ctx context.Context, sellerId int64) (bool, error)
 	FindAllBySellerId(ctx context.Context, sellerId int64) ([]Product, error)
 	Search(ctx context.Context, filters ProductSearchFilter, pagingReq PagingRequest) ([]Product, Paging, error)
 }

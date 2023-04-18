@@ -37,7 +37,7 @@ func main() {
 	findSellerByIdQuery := query.NewFindSellerById(sellerRepo, productRepo)
 	createSellerCmd := command.NewCreateSeller(sellerRepo)
 	updateSellerCmd := command.NewUpdateSeller(sellerRepo, *findSellerByIdQuery)
-	deleteSellerCmd := command.NewDeleteSeller(sellerRepo, *findSellerByIdQuery)
+	deleteSellerCmd := command.NewDeleteSeller(sellerRepo, productRepo, *findSellerByIdQuery)
 
 	//product
 	findProductByIdQuery := query.NewFindProductById(productRepo)

@@ -8,12 +8,14 @@ import (
 
 type DeleteSeller struct {
 	sellerRepo          model.SellerRepository
+	productRepo         model.ProductRepository
 	findSellerByIdQuery query.FindSellerById
 }
 
-func NewDeleteSeller(sellerRepo model.SellerRepository, findSellerById query.FindSellerById) *DeleteSeller {
+func NewDeleteSeller(sellerRepo model.SellerRepository, productRepo model.ProductRepository, findSellerById query.FindSellerById) *DeleteSeller {
 	return &DeleteSeller{
 		sellerRepo:          sellerRepo,
+		productRepo:         productRepo,
 		findSellerByIdQuery: findSellerById,
 	}
 }
@@ -24,6 +26,9 @@ func (c DeleteSeller) Do(ctx context.Context, id int64) error {
 		return err
 	}
 	if _, err := c.sellerRepo.Delete(ctx, id); err != nil {
+		return err
+	}
+	if _, err := c.productRepo.DeleteAllBySellerId(ctx, id); err != nil {
 		return err
 	}
 	return nil

@@ -65,6 +65,21 @@ func (mr *MockProductRepositoryMockRecorder) Delete(ctx, id interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockProductRepository)(nil).Delete), ctx, id)
 }
 
+// DeleteAllBySellerId mocks base method.
+func (m *MockProductRepository) DeleteAllBySellerId(ctx context.Context, sellerId int64) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAllBySellerId", ctx, sellerId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteAllBySellerId indicates an expected call of DeleteAllBySellerId.
+func (mr *MockProductRepositoryMockRecorder) DeleteAllBySellerId(ctx, sellerId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAllBySellerId", reflect.TypeOf((*MockProductRepository)(nil).DeleteAllBySellerId), ctx, sellerId)
+}
+
 // FindAllBySellerId mocks base method.
 func (m *MockProductRepository) FindAllBySellerId(ctx context.Context, sellerId int64) ([]model.Product, error) {
 	m.ctrl.T.Helper()

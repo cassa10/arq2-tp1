@@ -81,6 +81,19 @@ func (r *productRepository) Delete(ctx context.Context, id int64) (bool, error) 
 	return true, nil
 }
 
+func (r *productRepository) DeleteAllBySellerId(ctx context.Context, sellerId int64) (bool, error) {
+	log := r.logger.WithFields(logger.Fields{"method": "DeleteAllBySellerId", "sellerId": sellerId})
+	timeout, cf := context.WithTimeout(ctx, r.timeout)
+	defer cf()
+	deleteRes, err := r.db.Collection(productCollection).DeleteMany(timeout, bson.M{"sellerId": sellerId})
+	if err != nil {
+		log.WithFields(logger.Fields{"error": err}).Errorf("error when delete product with sellerId %v", sellerId)
+		return false, err
+	}
+	log.Infof("%v products was deleted with sellerId %v", deleteRes.DeletedCount, sellerId)
+	return true, nil
+}
+
 func (r *productRepository) Create(ctx context.Context, product model.Product) (int64, error) {
 	log := r.logger.WithFields(logger.Fields{"method": "Create"})
 	timeoutCtx, cf := context.WithTimeout(ctx, r.timeout)
