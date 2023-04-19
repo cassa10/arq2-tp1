@@ -2,12 +2,18 @@
 
 [Enunciado del Trabajo Práctico](https://github.com/cassa10/arq2-tp1/blob/main/doc/Arq2%20-%20Trabajo%20pr%C3%A1ctico.pdf)
 
+## Tecnologías:
+
+- [Golang](https://go.dev/)
+- [Gin (WEB API)](https://gin-gonic.com/)
+- [MongoDB](https://www.mongodb.com/)
+
+## Prerequisitos:
+
+- Go 1.20 or up / Docker
+
 
 ## Test y coverage
-
-### Prerequisitos:
-
-- Go 1.20 or up
 
 ### Pasos:
 
@@ -34,24 +40,26 @@ Dichos archivos se pueden acceder desde un volume vinculado o sino ejecutando ba
 
 ## Swagger
 
+Instalar swag localmente (se necesita go 1.20 or up)
+
+```
+go install github.com/swaggo/swag/cmd/swag@v1.8.10
+```
+
 Para actualizar la api doc de swagger, ejecutar en el folder root del repo:
 
 ```
 swag init -g src/infrastructure/api/app.go
 ```
 
-Luego de levantar la api, ir al endpoint:
+Luego de levantar la api e ir al endpoint:
 
 ```
 http://localhost:<port>/docs/index.html
 ```
 
 
-## Inicialización y ejecución del proyecto
-
-### Prerequisitos:
-
-- Docker
+## Inicialización y ejecución del proyecto (docker)
 
 ### Pasos:
 
