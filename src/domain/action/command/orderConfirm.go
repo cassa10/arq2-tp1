@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"github.com/cassa10/arq2-tp1/src/domain/model"
-	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
 )
 
 type ConfirmOrder struct {
@@ -21,10 +20,7 @@ func (c ConfirmOrder) Do(ctx context.Context, order *model.Order) error {
 	if order.IsConfirmed() {
 		return nil
 	}
-	ok := order.Confirm()
-	if !ok {
-		return exception.OrderInvalidTransitionState{Id: order.Id}
-	}
+	order.Confirm()
 	if _, err := c.orderRepo.Update(ctx, *order); err != nil {
 		return err
 	}
