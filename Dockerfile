@@ -16,16 +16,16 @@ RUN go mod download
 
 COPY /src  ./src/
 
-# update swagger docs/
-RUN go install github.com/swaggo/swag/cmd/swag@latest
-RUN swag init -g src/infrastructure/api/app.go
-
 # run tests and generate coverage files only domain
 RUN go test -coverprofile="coverage.out" -covermode=atomic ./src/domain/...
 
 # generate a readable file for percents of domain coverage
 RUN go install gitlab.com/fgmarand/gocoverstats@latest
 RUN gocoverstats -v -f coverage.out -percent > coverage_rates.out
+
+# update swagger docs/
+RUN go install github.com/swaggo/swag/cmd/swag@v1.8.10
+RUN swag init -g src/infrastructure/api/app.go
 
 WORKDIR /src/src/cmd
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o /arq2-tp1-app
