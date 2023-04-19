@@ -17,6 +17,10 @@ func NewConfirmOrder(orderRepo model.OrderRepository) *ConfirmOrder {
 }
 
 func (c ConfirmOrder) Do(ctx context.Context, order *model.Order) error {
+	//idempotency
+	if order.IsConfirmed() {
+		return nil
+	}
 	ok := order.Confirm()
 	if !ok {
 		return exception.OrderInvalidTransitionState{Id: order.Id}

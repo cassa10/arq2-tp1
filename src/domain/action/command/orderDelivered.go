@@ -17,6 +17,10 @@ func NewDeliveredOrder(orderRepo model.OrderRepository) *DeliveredOrder {
 }
 
 func (c DeliveredOrder) Do(ctx context.Context, order *model.Order) error {
+	//idempotency
+	if order.IsDelivered() {
+		return nil
+	}
 	ok := order.Delivered()
 	if !ok {
 		return exception.OrderInvalidTransitionState{Id: order.Id}

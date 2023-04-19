@@ -22,6 +22,8 @@ type OrderState interface {
 	Confirm(order *Order) bool
 	// Delivered returns true when order mutates
 	Delivered(order *Order) bool
+	IsConfirmed() bool
+	IsDelivered() bool
 	String() string
 	MarshalJSON() ([]byte, error)
 }
@@ -38,6 +40,14 @@ func (pS PendingOrderState) Confirm(order *Order) bool {
 }
 
 func (pS PendingOrderState) Delivered(_ *Order) bool {
+	return false
+}
+
+func (pS PendingOrderState) IsConfirmed() bool {
+	return false
+}
+
+func (pS PendingOrderState) IsDelivered() bool {
 	return false
 }
 
@@ -60,6 +70,14 @@ func (cS ConfirmedOrderState) Delivered(order *Order) bool {
 	return true
 }
 
+func (cS ConfirmedOrderState) IsConfirmed() bool {
+	return true
+}
+
+func (cS ConfirmedOrderState) IsDelivered() bool {
+	return false
+}
+
 func (cS ConfirmedOrderState) String() string {
 	return confirmedOrderState
 }
@@ -76,6 +94,14 @@ func (dS DeliveredOrderState) Confirm(_ *Order) bool {
 
 func (dS DeliveredOrderState) Delivered(_ *Order) bool {
 	return false
+}
+
+func (dS DeliveredOrderState) IsConfirmed() bool {
+	return true
+}
+
+func (dS DeliveredOrderState) IsDelivered() bool {
+	return true
 }
 
 func (dS DeliveredOrderState) String() string {

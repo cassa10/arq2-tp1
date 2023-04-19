@@ -43,6 +43,14 @@ func (o *Order) Delivered() bool {
 	return o.State.Delivered(o)
 }
 
+func (o *Order) IsConfirmed() bool {
+	return o.State.IsConfirmed()
+}
+
+func (o *Order) IsDelivered() bool {
+	return o.State.IsDelivered()
+}
+
 func (o *Order) StateAsString() string {
 	return o.State.String()
 }

@@ -133,3 +133,25 @@ func Test_GivenAnyOrderNoConfirmed_WhenReceiveDelivered_TheDoNothingAndReturnFal
 	assert.False(t, isDelivered1)
 	assert.False(t, isDelivered2)
 }
+
+func Test_GivenOrderPending_WhenReceiveIsConfirmedOrDelivered_ThenReturnFalse(t *testing.T) {
+	pendingOrder := Order{State: PendingOrderState{}}
+	assert.False(t, pendingOrder.IsConfirmed())
+	assert.False(t, pendingOrder.IsDelivered())
+}
+
+func Test_GivenOrderConfirmed_WhenReceiveIsConfirmed_ThenReturnTrue(t *testing.T) {
+	confirmedOrder := Order{State: ConfirmedOrderState{}}
+	assert.True(t, confirmedOrder.IsConfirmed())
+}
+
+func Test_GivenOrderConfirmed_WhenReceiveIsDelivered_ThenReturnFalse(t *testing.T) {
+	confirmedOrder := Order{State: ConfirmedOrderState{}}
+	assert.False(t, confirmedOrder.IsDelivered())
+}
+
+func Test_GivenOrderDelivered_WhenReceiveIsConfirmedOrDelivered_ThenReturnTrue(t *testing.T) {
+	deliveredOrder := Order{State: DeliveredOrderState{}}
+	assert.True(t, deliveredOrder.IsConfirmed())
+	assert.True(t, deliveredOrder.IsDelivered())
+}

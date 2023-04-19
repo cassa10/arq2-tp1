@@ -7,6 +7,7 @@ import (
 	"github.com/cassa10/arq2-tp1/src/domain/mock"
 	"github.com/cassa10/arq2-tp1/src/domain/model"
 	"github.com/cassa10/arq2-tp1/src/domain/model/exception"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -31,7 +32,24 @@ func Test_GivenAConfirmedOrderAndDeliveredOrderUseCase_WhenDo_ThenReturnNoErrorA
 	assert.Equal(t, model.DeliveredOrderState{}, order.State)
 }
 
-func Test_GivenANoConfirmedOrderAndDeliveredOrderUseCase_WhenDo_ThenReturnErrorInvalidTransitionStateAndNoMutateOrder(t *testing.T) {
+func Test_GivenADeliveredOrderAndDeliveredOrderUseCase_WhenDo_ThenDoNothingAndReturnNoErrorForIdempotency(t *testing.T) {
+	deliveredOrderUseCase, mocks := setUpDeliveredOrderUseCase(t)
+	ctx := context.Background()
+	idDeliveredOrder := int64(6)
+	deliveredOrder := &model.Order{
+		Id:    idDeliveredOrder,
+		State: model.DeliveredOrderState{},
+	}
+	copyDeliveredOrder := *deliveredOrder
+	mocks.OrderRepo.EXPECT().FindById(ctx, idDeliveredOrder).Return(deliveredOrder, nil)
+	mocks.OrderRepo.EXPECT().Update(ctx, gomock.Any()).Times(0)
+	err := deliveredOrderUseCase.Do(ctx, idDeliveredOrder)
+
+	assert.NoError(t, err)
+	assert.Equal(t, copyDeliveredOrder, *deliveredOrder)
+}
+
+func Test_GivenAPendingOrderAndDeliveredOrderUseCase_WhenDo_ThenDoNothingAndReturnInvalidTransitionStateError(t *testing.T) {
 	deliveredOrderUseCase, mocks := setUpDeliveredOrderUseCase(t)
 	ctx := context.Background()
 	idPendingOrder := int64(4)
@@ -39,24 +57,15 @@ func Test_GivenANoConfirmedOrderAndDeliveredOrderUseCase_WhenDo_ThenReturnErrorI
 		Id:    idPendingOrder,
 		State: model.PendingOrderState{},
 	}
-	idDeliveredOrder := int64(6)
-	deliveredOrder := &model.Order{
-		Id:    idDeliveredOrder,
-		State: model.DeliveredOrderState{},
-	}
 
-	copyDeliverededOrder := *pendingOrder
-	copyDeliveredOrder := *deliveredOrder
+	copyPendingOrder := *pendingOrder
 	mocks.OrderRepo.EXPECT().FindById(ctx, idPendingOrder).Return(pendingOrder, nil)
-	mocks.OrderRepo.EXPECT().FindById(ctx, idDeliveredOrder).Return(deliveredOrder, nil)
+	mocks.OrderRepo.EXPECT().Update(ctx, gomock.Any()).Times(0)
 
-	err1 := deliveredOrderUseCase.Do(ctx, idPendingOrder)
-	err2 := deliveredOrderUseCase.Do(ctx, idDeliveredOrder)
+	err := deliveredOrderUseCase.Do(ctx, idPendingOrder)
 
-	assert.ErrorIs(t, err1, exception.OrderInvalidTransitionState{Id: idPendingOrder})
-	assert.ErrorIs(t, err2, exception.OrderInvalidTransitionState{Id: idDeliveredOrder})
-	assert.Equal(t, &copyDeliverededOrder, pendingOrder)
-	assert.Equal(t, &copyDeliveredOrder, deliveredOrder)
+	assert.ErrorIs(t, err, exception.OrderInvalidTransitionState{Id: idPendingOrder})
+	assert.Equal(t, copyPendingOrder, *pendingOrder)
 }
 
 func Test_GivenDeliveredOrderUseCaseAndAConfirmedOrderAndOrderRepoFindByIdError_WhenDo_ThenReturnThatError(t *testing.T) {
